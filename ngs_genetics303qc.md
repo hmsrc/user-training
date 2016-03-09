@@ -4,7 +4,7 @@ This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Sp
 
 ### Logging into Orchestra
 
-Orchestra is the Harvard Medical School High-Performance Compute environment.  With over 7000 cores, 40TB of ram and 25PB attached netework storage, Orchestra is designed to meet the demands of next-generation sequence analysis.  Orchestra allows users to leverage the power of compute across multiple cores in a highly-scalable manner.
+Orchestra is the Harvard Medical School High-Performance Compute environment.  With over 7000 cores, 40TB of RAM and 25PB attached netework storage, Orchestra is designed to meet the demands of next-generation sequence analysis.  Orchestra allows users to leverage the power of compute across multiple cores in a highly-scalable manner.
 
 Orchestra user accounts can be created for anyone with an eCommons ID.  To have an account created, visit
 http://rc.hms.harvard.edu/#orchestra
@@ -13,16 +13,16 @@ and fill out the account request form.
 To log into Orchestra, 
 
    * Mac: from the terminal, type
-   ```sh
+   ```
    ssh -l userid orchestra.med.harvard.edu
    ```
    * Windows: from PuTTY, type in  "Host Name"
-   ```sh
+   ```
    orchestra.med.harvard.edu
    ```
    and use your eCommons ID and password
    * Linux: from the terminal, type
-   ```sh
+   ```
    ssh -l userid orchestra.med.harvard.edu
    ```
 
