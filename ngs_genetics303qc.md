@@ -266,9 +266,10 @@ First download the BAM files with their corresponding BAI folders to your comput
 
 Then, launch IGV, and load the reference genome track (Genomes->Load Genome from Server->D. melanogaster (dm3)).  Now, you can load your BAM files (File->Load from File)
 
-
+![alt text](https://github.com/hmsrc/user-training/blob/master/igvshot.png "IGV Screenshot")
 
 ### Read Counting with HTSeq
+
 
 The number of reads assigned to a gene feature can be turned into a counts file with htseq-count.  This Python tool relies on the GTF coordinates and annotation to assign a read to a gene.  Files must first be name sorted with Samtools to create a "*.sort.bam file" and can then be counted. We are assuming the experiments are not stranded.
 
