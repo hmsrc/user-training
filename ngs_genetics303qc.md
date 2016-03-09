@@ -1,4 +1,4 @@
-# HMS Research Commputing: Intro to Next-Gen Sequencing Technologies Part II
+# HMS Research Computing: Intro to Next-Gen Sequencing Technologies Part II
 
 This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Spring 2016 for HMS Genetics 303qc.  It provices an Orchestra HPC environment-oriented workflow for RNA-seq analysis.
 
@@ -194,7 +194,6 @@ Currently Loaded Modulefiles:
   1) dev/java/jdk1.8          4) atlas/3.10.2             7) utils/hdf5/1.8.15       10) seq/samtools/1.2
   2) seq/fastqc/0.11.3        5) dev/compiler/gcc-4.8.5   8) dev/python/2.7.6
   3) seq/bowtie/2.1.0         6) utils/zlib/1.2.8         9) seq/tophat/2.1.0
-
 
 ```
 
