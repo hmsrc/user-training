@@ -1,10 +1,10 @@
 # HMS Research Computing: Intro to Next-Gen Sequencing Technologies Part II
 
-This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Spring 2016 for HMS Genetics 303qc.  It provices an Orchestra HPC environment-oriented workflow for RNA-seq analysis.
+This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Spring 2016 for HMS Genetics 303qc.  It provides an Orchestra HPC environment-oriented workflow for RNA-seq analysis.
 
 ### Logging into Orchestra
 
-Orchestra is the Harvard Medical School High-Performance Compute environment.  With over 7000 cores, 40TB of RAM and 25PB attached netework storage, Orchestra is designed to meet the demands of next-generation sequence analysis.  Orchestra allows users to leverage the power of compute across multiple cores in a highly-scalable manner.
+Orchestra is the Harvard Medical School High-Performance Compute environment.  With over 7000 cores, 40 TB of RAM and 25 PB attached netework storage, Orchestra is designed to meet the demands of next-generation sequence analysis.  Orchestra allows users to leverage the power of compute across multiple cores in a highly scalable manner.
 
 Orchestra user accounts can be created for anyone with an eCommons ID.  To have an account created, visit
 http://rc.hms.harvard.edu/#orchestra
@@ -52,21 +52,21 @@ tail = Display the last 10 lines
 
 ### Orchestra Jobs
 
-Users do their computations on the cluster by submitting jobs (bsubs) to LSF, the cluster scheduler.  LSF identifies the resources needed and queues up jobs, giving priority with higher fairshare (they have submitted less jobs), and to queues with shorter resource requirements.  
+Users do their computations on the cluster by submitting jobs (bsubs) to LSF, the cluster scheduler.  LSF identifies the resources needed and queues up jobs, giving priority to users with higher fairshare (they have submitted less jobs), to queues with shorter time limits, and to jobs with smaller resource requirements.  
 
 Jobs are submitted with a "bsub", and always require
 * -q a queue #see table below
 * -W a wall time #jobs are killed once they exceed this limit
 
-| Queue Name | Max Cores | Max Runtime |
-| ---------- | --------- | ----------- |
-| Interactive| 12 | 12hr |
-| priority | 20 | 1 month |
-| mcore | 20 | 1 montn |
-| mpi | 512 | 1 month |
-| short | 12 | 12 hr |
-| mini | 12 | 10min |
-| long | 12 | 1 month |
+| Queue Name | Max Cores | Max Runtime | Best for |
+| ---------- | --------- | ----------- | -------- |
+| interactive| 12 | 12hr | programming, interactive use |
+| priority | 20 | 1 month | urgent jobs (2 max) |
+| mcore | 20 | 1 month | multi-core jobs |
+| mpi | 512 | 1 month | Large jobs with special parallel code |
+| short | 12 | 12 hr | short single-core jobs |
+| mini | 1 | 10min | very short single-core jobs |
+| long | 12 | 1 month | long single-core jobs |
 
 additional options include
 * -n number of course requested #most compute nodes have 12 cores, a small subset has 20
@@ -92,7 +92,7 @@ mfk8@clarinet002:~$ module purge                    #unlod all modules
 ### Monitoring Jobs on Orchestra
 ```sh
 
-mfk8@clarinet002:~$ bjobs           #lists all jobs running/pending
+mfk8@clarinet002:~$ bjobs           #lists all jobs I have running/pending
 mfk8@clarinet002:~$ bjobs -l jobid  #gives command used for job
 mfk8@clarinet002:~$ bkill jobid     #kills job
 mfk8@clarinet002:~$ bkill 0         #kills all jobs
@@ -100,7 +100,7 @@ mfk8@clarinet002:~$ bkill 0         #kills all jobs
 
 ### Getting Data To/From Orchestra
 
-You can use an sFTP client to download files to your laptop/desktop. RC recommends "FileZilla," which works on all platforms. Login is the same, orchestra.med.harvard.edu , and files can be dragged and dropped to-from Orchestra.  Simple directory manipulations can also be performed via the GUI, but a "refresh" is required to see the effects.
+You can use an sFTP client to download files to your laptop/desktop. RC recommends "FileZilla," which works on all platforms. Login is the same, orchestra.med.harvard.edu, and files can be dragged and dropped to-from Orchestra.  Simple directory manipulations can also be performed via the GUI, but a "refresh" is required to see the effects.
 
 https://filezilla-project.org/
 
@@ -115,7 +115,7 @@ $ bsub -q short -W 1:00 "fastq-dump SRRXXXXX"
 
 # RNA-seq processing exercise
 
-We will be working with a small toy Drosopila dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs.  Then we will align these files to the dm3 genome with a popular aligner, TopHat. We will practice manipulating the files using Samtools.  We will download our aligned files to a personal machine, and visuzlize using IGV.  We will then collapse the alignments into counts files using HTSeq, to prepare them for downstream differential expression analysis using tools available in R.
+We will be working with a small toy Drosophila dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs.  Then we will align these files to the dm3 genome with a popular aligner, TopHat. We will practice manipulating the files using Samtools.  We will download our aligned files to a personal machine, and visuzlize using IGV.  We will then collapse the alignments into counts files using HTSeq, to prepare them for downstream differential expression analysis using tools available in R.
 
 ### Class datafiles
 
@@ -143,7 +143,7 @@ mfk8@clarinet002:~/ngsclass$ ls -lh
 
 ```
 
-This is a Drosophila fastq dataset, with 2 groups (g1/g2) with 2 samples each (s1/21), paired end (_1, _2).  But really, what is your data?
+This is a Drosophila fastq dataset, with 2 groups (g1/g2) with 2 samples each (s1/s2), paired end (_1, _2).  But really, what is your data?
 
 ```sh
 $ head g1_s1_1.fastq
@@ -156,7 +156,7 @@ The SRA identity is found in the @ line.  You can search GEO for this SRR number
 
 ### QC Check: FastQC
 
-A quick QC check will identify problems with the quality of the reads, identify adapter/barcode sequence, kmers, and more.  FastQC is the standard for performing efficient QC checks.  It creates an html report for each file.  These html reports are best downloaded and viewed on  a personal computer.  
+A quick QC check will identify problems with the quality of the reads, identify adapter/barcode sequence, kmers, and more.  FastQC is the standard for performing efficient QC checks.  It creates an html report for each file.  These html reports are best downloaded and viewed on a personal computer.  
 
 We will submit jobs to Orchestra to perform FastQC.  This program will take less than 5 minutes to complete, and only requires 1 core, so the jobs belong in the "short" queue.  However, since we only have a few jobs to run, and 2 can run at a time in the "priority" queue with little to no pend time, we will run our jobs there.  With a simple "for" loop, we can submit all of the jobs at once, by looping through all of the files ending in ".fastq" in the directory.
 
@@ -197,7 +197,7 @@ Currently Loaded Modulefiles:
 
 ```
 
-Bowtie relies on index files to speedily align to a reference genome.  These are Bowtie-parsed versions of the reference genome in a format that Bowtie can read.  Bowtie1 index files end in .ebwt, and Bowtie2 index files end in .bt2 .  We are using Bowtie2.  The Illumina igenome project created Bowtie index files for common genomes to standard reference genomes.  In Orchestra, these are located in /groups/shared_databases/igenomes/organism .  For Bowtie2 indexes for hg19, hg18, mm10, mm9, and dm3, we have created a softlink that points directily to these igenome Bowtie2 indexes that are located in /groups/shared_databases/igenome/organism/UCSC/version/Sequence/Bowtie2Index, and can just be referenced as such.  
+Bowtie relies on index files to speedily align to a reference genome.  These are Bowtie-parsed versions of the reference genome in a format that Bowtie can read.  Bowtie1 index files end in .ebwt, and Bowtie2 index files end in .bt2 .  We are using Bowtie2.  The Illumina igenome project created Bowtie index files for common genomes to standard reference genomes.  In Orchestra, these are located in /groups/shared_databases/igenomes/organism .  For Bowtie2 indexes for hg19, hg18, mm10, mm9, and dm3, we have created a softlink that points directly to these igenome Bowtie2 indexes that are located in /groups/shared_databases/igenome/organism/UCSC/version/Sequence/Bowtie2Index, and can just be referenced as such.  
 
 One of the key differences between UCSC and NCBI notation is how chromosomes are called.  In UCSC, the chromosome is called by "chr1", in Ensembl, it is just "1".  In order to use GTF annotation files on UCSC-aligned .bam files, the "chr" must first be stripped from the GTF file.
 
