@@ -165,7 +165,7 @@ $ module load seq/fastqc/0.11.3
 $ for i in *.fastq; do bsub -q priority -W 5 fastqc $i; done
 ```
 
-We will download these files to our personal computers to view them.  In FileZilla, navigate to your "seqclass" folder, and drag and drop the files labeled below to a location on your computer.
+We will download these files to our personal computers to view them.  In FileZilla, navigate to your "ngsclass" folder, and drag and drop the files labeled below to a location on your computer.
 ```sh
 g1_s1_1.fastqc.html
 g1_s1_2.fastqc.html
@@ -183,7 +183,7 @@ These files are 89-91bp long, with Sanger 1.5 PHRED encoding.  They are of accep
 
 ### TopHat2 Alignment
 
-We will first use TopHat2 to align these files to a reference genome,  and annotate them.  TopHat2 relies on its partner program Bowtie1/2 to do the alignment, while TopHat2 maps splice junctions, transcription splice sites, and novel isoforms.  
+We will first use TopHat2 to align these files to a reference genome,  and annotate them.  TopHat2 relies on its partner program Bowtie1/2 to do the alignment, while TopHat2 maps splice junctions, transcription start sites, and novel isoforms.  
 
 We will first load the TopHat2/Bowtie2 modules, along with Samtools.  Note all of the other software co-loaded by Orchestra, to solve dependency issues.
 
