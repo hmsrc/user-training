@@ -1,0 +1,11 @@
+ID,neversmoke,smoke,pastsmoke,gender
+1,0,1,0,male
+2,0,1,0,female
+3,0,0,0,male
+4,1,0,0,female
+5,0,0,1,male
+6,0,1,0,female
+7,0,0,1,male
+8,0,0,1,female
+9,1,0,0,male
+10,0,0,1,female
