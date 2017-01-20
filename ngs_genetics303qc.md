@@ -4,7 +4,7 @@ This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Sp
 
 ### Logging into Orchestra
 
-Orchestra is the Harvard Medical School High-Performance Compute environment.  With over 7000 cores, 40 TB of RAM and 25 PB attached netework storage, Orchestra is designed to meet the demands of next-generation sequence analysis.  Orchestra allows users to leverage the power of compute across multiple cores in a highly scalable manner.
+Orchestra is the Harvard Medical School High-Performance Compute environment.  With over 8000 cores, 42 TB of RAM and 32 PB attached netework storage, Orchestra is designed to meet the demands of next-generation sequence analysis.  Orchestra allows users to leverage the power of compute across multiple cores in a highly scalable manner.
 
 Orchestra user accounts can be created for anyone with an eCommons ID.  To have an account created, visit
 http://rc.hms.harvard.edu/#orchestra
@@ -28,8 +28,8 @@ To log into Orchestra,
 
 ### Welcome!
 
-Now on the shell login servers (loge/mezzanine), please don't do computationally-heavy work here!
-Instead, launch an interactive session to work on a compute node (clarinets, bassoons, fifes, piccolos, etc)
+Now on the shell login servers (loge/mezzanine/gallery/pit), please don't do computationally-heavy work here!
+Instead, launch an interactive session to work on a compute node (clarinets, ottavinos, fifes, ocarinas, piccolos, etc)
 
 ```sh
 mfk8@loge:~$ bsub -Is -q interactive bash
@@ -71,8 +71,8 @@ Jobs are submitted with a "bsub", and always require
 additional options include
 * -n number of course requested #most compute nodes have 12 cores, a small subset has 20
 * -R "select[mem=16000]" memory request #most machines have 90GB free, a small subset has 120GB
-* -e errorfile
-* -o outfile
+* -e %J.err errorfile with jobid inserted
+* -o %J.out outfile with  jobid inserted
 * -N job completion notification
 
 ### Software on Orchestra
@@ -100,7 +100,7 @@ mfk8@clarinet002:~$ bkill 0         #kills all jobs
 
 ### Getting Data To/From Orchestra
 
-You can use an sFTP client to download files to your laptop/desktop. RC recommends "FileZilla," which works on all platforms. Login is the same, orchestra.med.harvard.edu, and files can be dragged and dropped to-from Orchestra.  Simple directory manipulations can also be performed via the GUI, but a "refresh" is required to see the effects.
+You can use an sFTP client to download files to your laptop/desktop. RC recommends "FileZilla," which works on all platforms. Login is to transfer.orchestra.med.harvard.edu, and files can be dragged and dropped to-from Orchestra.  Simple directory manipulations can also be performed via the GUI, but a "refresh" is required to see the effects.
 
 https://filezilla-project.org/
 
@@ -115,7 +115,7 @@ $ bsub -q short -W 1:00 "fastq-dump SRRXXXXX"
 
 # RNA-seq processing exercise
 
-We will be working with a small toy Drosophila dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs.  Then we will align these files to the dm3 genome with a popular aligner, TopHat. We will practice manipulating the files using Samtools.  We will download our aligned files to a personal machine, and visuzlize using IGV.  We will then collapse the alignments into counts files using HTSeq, to prepare them for downstream differential expression analysis using tools available in R.
+We will be working with a small toy Drosophila dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs.  Then we will align these files to the dm3 genome with a popular aligner, TopHat. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, We will download our aligned files to a personal machine.  We will then collapse the alignments into read counts files using HTSeq, to prepare them for downstream differential expression analysis using tools available in R.
 
 ### Class datafiles
 
@@ -197,15 +197,17 @@ Currently Loaded Modulefiles:
 
 ```
 
-Bowtie relies on index files to speedily align to a reference genome.  These are Bowtie-parsed versions of the reference genome in a format that Bowtie can read.  Bowtie1 index files end in .ebwt, and Bowtie2 index files end in .bt2 .  We are using Bowtie2.  The Illumina igenome project created Bowtie index files for common genomes to standard reference genomes.  In Orchestra, these are located in /groups/shared_databases/igenomes/organism .  For Bowtie2 indexes for hg19, hg18, mm10, mm9, and dm3, we have created a softlink that points directly to these igenome Bowtie2 indexes that are located in /groups/shared_databases/igenome/organism/UCSC/version/Sequence/Bowtie2Index, and can just be referenced as such.  
+Bowtie relies on index files to speedily align to a reference genome.  These are Bowtie-parsed versions of the reference genome in a format that Bowtie can read.  Bowtie1 index files end in .ebwt, and Bowtie2 index files end in .bt2 .  We are using Bowtie2.  The Illumina igenome project created Bowtie index files for common genomes to standard reference genomes.  In Orchestra, these are located in /groups/shared_databases/igenomes/organism .  For Bowtie2 indexes for hg19, hg18, mm10, mm9, and dm3, we have created a softlink that points directly to these igenome Bowtie2 indexes that are located in /groups/shared_databases/igenome/organism/UCSC/version/Sequence/Bowtie2Index, and can just be referenced as "dm3", "hg19" etc.  
 
 One of the key differences between UCSC and NCBI notation is how chromosomes are called.  In UCSC, the chromosome is called by "chr1", in Ensembl, it is just "1".  In order to use GTF annotation files on UCSC-aligned .bam files, the "chr" must first be stripped from the GTF file.
 
 For this TopHat2 alignment, we are considering the sequencing library prep to be unstranded.
 
-We will be utilizing multithreading to distribute the compute job over multiple cores (the -p option).  The majority of Orchestra machines have up to 12 cores available per node; a small subset have 20.  The more cores that are requested, the longer a job takes to dispatch, as resources are collected for the job.  
+We will be utilizing multithreading to distribute the compute job over multiple cores (the -p option).  The majority of Orchestra machines have up to 12 cores available per node; a small subset have 20 or more.  The larger number of cores that are requested, the longer a job takes to dispatch, as resources are collected for the job.  
 
-The TopHat command format is: tophat -p processors -o outputdirectory path/to/genomeIndexFiles read1.fastq (read2.fastq)
+The TopHat command format is: tophat -p processors -o outputdirectory path/to/genomeIndexFiles read1.fastq (read2.fastq) .  Each TopHat run needs its own directory to write its output files to, since the output all follow the same generic naming convention (like align_summary.txt, accepted_hits.bam).
+
+We will be mirroring the resource request options in our bsub (-p 4 cores requested in TopHat, -n 4 cores requested in Orchestra bsub).  As a good practice, we are creating error and output files, where %J inserts the jobid that Orchestra allocates.  These error and output files (logs) will be collected in a directory we create called "tophat_logs".  
 
 ```sh
 $ mkdir tophat_logs
@@ -221,7 +223,7 @@ $ bsub -q mcore -W 1:00 -n 4 -o ./tophat_logs/%J.out -e ./tophat_logs/%J.err -N 
 
 Where are your aligned files?  For each analysis, you created a folder called tophat_gX_sX, and the aligned file is called "accepted_hits.bam".  The summary of the alignment is "align_summary.txt:, and the insertions, deletions, and splice junctions are bed coordinates files named accordingly.  Information on job runtime/success/errors is found in the folder "tophat_logs", by jobid.  Look at these files by "less tophat_logs/JOBID.err" to view.
 
-Let's rename the .bam files and create .bai (.bam index files) for each TopHat hit.  These will be necessary for visualization.
+First, let's copy all the "acccepted_hits.bam" files to their actual names.   Then, we let's create .bai (.bam index files) for each TopHat hit.  These will be necessary for visualization.  This job takes about a minute to run, so we're placing it in the "short" queue.
 
 ```sh
 # from root data directory
@@ -271,7 +273,7 @@ Then, launch IGV, and load the reference genome track (Genomes->Load Genome from
 ### Read Counting with HTSeq
 
 
-The number of reads assigned to a gene feature can be turned into a counts file with htseq-count.  This Python tool relies on the GTF coordinates and annotation to assign a read to a gene.  Files must first be name sorted with Samtools to create a "*.sort.bam file" and can then be counted. We are assuming the experiments are not stranded.
+The number of reads assigned to a gene feature can be turned into a counts file with htseq-count.  This Python tool relies on the GTF coordinates and annotation to assign a read to a gene.  Files must first be name sorted with Samtools to create a "*.sort.bam" file and can then be counted. We are assuming the experiments are not stranded. We are ordering on name (128up->zuc).
 
 ```sh
 # Sort the TopHat experiment on name (-n)
