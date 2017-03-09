@@ -1,6 +1,6 @@
 # HMS Research Computing: Intro to Next-Gen Sequencing Technologies Part II
 
-This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Spring 2016 for HMS Genetics 303qc.  It provides an Orchestra HPC environment-oriented workflow for RNA-seq analysis.
+This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Spring 2017 for HMS Genetics 303qc.  It provides an Orchestra HPC environment-oriented workflow for RNA-seq analysis.
 
 ### Logging into Orchestra
 
