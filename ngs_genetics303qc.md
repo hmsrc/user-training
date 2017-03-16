@@ -65,6 +65,7 @@ Jobs are submitted with a "bsub", and always require
 | mcore | 20 | 1 month | multi-core jobs |
 | mpi | 512 | 1 month | Large jobs with special parallel code |
 | short | 12 | 12 hr | short single-core jobs |
+| medium | 12 | 5 days | medium single-core jobs |
 | mini | 1 | 10min | very short single-core jobs |
 | long | 12 | 1 month | long single-core jobs |
 
