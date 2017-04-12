@@ -504,6 +504,28 @@ These are the basic steps of the Github Flow process. Create an Issue, Create a 
 
 While the are other features and capabilities in Github, just these simple steps go along ways towards establishing a collaborative coding environment.
 
+## Cloning an existing repository
+
+It is also easy to clone an existing repository from either the terminal or Github Desktop. First, navigate to https://github.com/hmsrc/hmsrcght.
+
+This is a sample repo I set up for this exercise. Look for a green button that says **Clone or download**. To clone via Github Desktop, just click Open in Desktop. To clone from the terminal, copy the repo URL and then in the terminal, type: `git clone https://github.com/hmsrc/hmsrcght.git`.
+
+You may have noticed that Github also supports Forking a Repository, which is like cloning to your local workstation, but makes Github.com "aware" of your server side clone.
+
+I wanted to point out a couple of nice rendering features of Github, like support for Jupyter Notebooks.
+
+I also wanted to add a few comments about `.gitignore`.
+
+## `gitignore` and What Not to Share
+
+It is really important to note that researchers dealing with data subject to legal restrictions that prohibit sharing (such as medical data) should be careful not to put sensitive data into repositories.
+
+Also, be extra careful not to accidentally put credentials, such as passwords and private keys, into repositories.
+
+Additionally, intermediate data files and other results that can be re-generated from raw data need not be added to version control.
+
+Adding a .gitignore file to your repo is a good way to help ensure you don't inadvertantly share sensitive info.
+
 ## Github Organizations
 
 So I wanted to quickly show you how a Github Organization like [HMS Resource Computing](https://github.com/hmsrc) can really improve collaboration.
@@ -520,12 +542,14 @@ and many other things. You can use Trello-style Kanban boards for light weight p
 
 ![Kanban](./img/hmsrcght-kanban.png)
 
-## Oh yeah, Emoji!
+I feel like I'm forgetting an important collaboration feature.
+
+## Oh yeah, Emoji :+1:
 
 :bowtie: | :smile: | :laughing: | :blush: | :smiley: | :relaxed: | :smirk: | :heart_eyes: | :flushed: | :relieved: | :satisfied: | :grin: | :wink: |  :tongue: | :unamused: | :sweat_smile: | :sweat:
 
 
-:-1: | :thumbsdown: | :ok_hand: | :punch: | :facepunch: | :fist: | :v: | :wave: | :hand: | :open_hands: | :point_up: | :point_down: |  :raised_hands: | :pray: | :point_up_2: | :clap: | :muscle: | :metal:
+:+1: | :thumbsdown: | :ok_hand: | :punch: | :facepunch: | :fist: | :v: | :wave: | :hand: | :open_hands: | :point_up: | :point_down: |  :raised_hands: | :pray: | :point_up_2: | :clap: | :muscle: | :metal:
 
 ## Q & A
 
