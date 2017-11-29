@@ -104,7 +104,7 @@ Once you have registered and verified your new account, you are ready to configu
 
 The main thing to be aware of is that there are three places that Git checks for configurations:
 
-- `/etc/gitconfig` - This is for system level configuration. Orchestra has many users, and there is no default system level Git configuration.
+- `/etc/gitconfig` - This is for system level configuration. O2 has many users, and there is no default system level Git configuration.
 
 - `~/.gitconfig` - This is the global configuration and applies to all of your repositories. This is what most people want.
 
