@@ -10,7 +10,7 @@
 
 **Date: 2017-11-29 3pm-5pm**
 
-Welcome to Introduction to Git and Github. This is our first time offering this course and we hope to improve the course over time. At the end of the session there will be a link to a course survey; any feedback you can offer would be greatly appreciated.
+Welcome to Introduction to Git and Github. This is our second time offering this course and I have incorporated feedback from the Spring session. At the end of this session there will be a link to a course survey; any feedback you can offer would be greatly appreciated.
 
 ## Registering for Github
 
@@ -30,13 +30,28 @@ So I started preparing for this class the way I normally research a new topic:
 
 Hmm. Ok. Well the Git we will be talking about today is actually an exciting piece of software; and its the most widely used modern version control system in the world.   
 
-It was originally developed by Linus Torvalds. You may have heard of his other popular project, the [Linux kernel](https://github.com/torvalds/linux) (which incindentally can be found on Github).
+It was originally developed by Linus Torvalds. You may have heard of his other popular project, the [Linux kernel](https://github.com/torvalds/linux).
 
-Git is actually a Distributed Version Control System. The key word being *distributed*. If you've ever worked on older version control systems, like CVS or Sourcesafe, you might remember that these systems were centralized and had one master place for the full version history of a repository. With Git, every collaborator has a repository that can contain the full history of all changes.
+Git is actually a Distributed Version Control System. The key word being *distributed*. Older version control systems, like CVS or Sourcesafe, are centralized and have one master place for the full version history of a repository. With Git, every collaborator has a repository that can contain the full history of all changes.
 
-The details of how Git came to be are interesting. The Linux project was actually using a proprietary version control system and a licensing change occurred. Details are available in a number of places including the [Wikipedia](https://en.wikipedia.org/wiki/Git) article. There are also many places to learn more about Git including it's [main site](https://git-scm.com/).
+The details of how Git came to be are interesting. The Linux project was using a proprietary version control system and a licensing change occurred. Details are available in a number of places including the [Wikipedia](https://en.wikipedia.org/wiki/Git) article.
 
-Interestingly, if you go to the man page for Git (by typing `man git`), you will see that it refers to itself as: **git - the stupid content tracker**
+Git is not the only distributed source control management (SCM) system in popular use today. There are several excellent SCM systems that offer similar capabilities to Git including:
+
+- [Mercurial SCM](https://www.mercurial-scm.org/)
+- [Fossil SCM](https://www.fossil-scm.org/index.html/doc/trunk/www/index.wiki)  
+
+Both of these projects are excellent and may fit your needs. But today, of course, we will be focusing on Git. While we will be covering different ways to interact with Git, you may be interested to know that Git is already installed on O2, as shown below:
+
+```bash
+$ which git
+/usr/bin/git
+$ git --version
+git version 1.8.3.1
+$ man git
+```
+
+Interestingly, if you take a look at the man page for Git, you will see that it refers to itself as: **git - the stupid content tracker**
 
 The man page also informs us that *Git is a fast, scalable, distributed revision control system with an unusually rich command set*.
 
@@ -68,17 +83,18 @@ We will cover some of the most useful features of Github collaboration.
 
 ## Download GitHub Desktop
 
-It is important to note that you can do all your work directly from the `git` command line interface (CLI). Taking this further, you could even do all your work directly from Orchestra.
+It is important to note that you can do all your work directly from the `git` command line interface (CLI). You could even do all your work directly on O2.
 
-But realistically that is not how most newer users choose to work. A common practice that using a system like Git allows is to development locally, using some mix of the command line and graphical tools and editors and then pushing changes up to Guthub.
+But realistically that is not how most newer users choose to work. A common practice that using a system like Git allows is to develop locally, using some mix of the command line and graphical tools and editors and then "pushing" changes up to Guthub.
 
 With that in mind, Github has developed  [GitHub Desktop](https://desktop.github.com/), a GUI version available for both **Mac** and **Windows**. I recommend trying it and seeing if it works for you.
 
 ![Github Desktop](./img/hmsrcght-desktop.png)
 
-I will be doing demonstrations today with Github Desktop for Mac. Additionally I will use a free, open source text editor named [Atom](https://atom.io/), which is also developed by Github and integrates really well with Git. That being said, I very often work directly with the CLI  and I will attempt to show both sides.
+I will be doing demonstrations today both with Github Desktop for Mac and a free, open source text editor named [Atom](https://atom.io/), which is also developed by Github and has really nice [integration with Github](https://github.atom.io/).
 
-On Linux, the `git` command is usually installed by default, as it is on Orchestra. To check if you already have Git by typing `git --version`. On Redhat/CentOS, you can install via `sudo yum install git` or on Ubuntu/Debian via `sudo apt-get install git`.
+
+On Linux, the `git` command is usually installed by default, as it is on O2. On Redhat/CentOS, you can install via `sudo yum install git` or on Ubuntu/Debian via `sudo apt-get install git`.
 
 There are many additional clients and helper tools available, such as fancy prompts and fancy diffs, and you can find more info via curated lists like [awesome-git](https://github.com/dictcp/awesome-git).
 
@@ -124,9 +140,9 @@ $ cat ~/.gitconfig
 	ui = auto
 ```
 
-These will get us started, but remember that there are  many additional settings you can add as you go. One popular setting is to [Cache your Github password](https://help.github.com/articles/caching-your-github-password-in-git/#platform-all). This recent article: https://blog.scottnonnenberg.com/better-git-configuration/ has some good suggestions for further configuration.
+These will get us started, but remember that there are  many additional settings you can add as you go. One popular setting is to [Cache your Github password](https://help.github.com/articles/caching-your-github-password-in-git/#platform-all). This article: https://blog.scottnonnenberg.com/better-git-configuration/ has some good suggestions for further configuration.
 
-It is also very easy to do this in Github Desktop. On the Mac version you want to go to `Preferences`,  add your Github accound and set your git config:
+It is also very easy to do this in Github Desktop. On the Mac version you want to go to `Preferences`,  add your Github account and set your git config:
 
 ![Github Desktop Preferences](./img/hmsrcght-config.png)
 
@@ -420,19 +436,11 @@ Back in the left-hand pane we should see the repo has now moved from the Other s
 
 ![view on github.com](./img/hmsrcght-openongithub.png)
 
-A browser should open with your new Github repository. Take a minute to review your commits and look around the repo.
+Your default browser should open with your new Github repository. Take a minute to review your commits and look around the repo.
 
 ## Github Flow
 
-As teams starting making Git a core part of their development process, several Git workflows became popular. One in particular, [Git Flow](http://nvie.com/posts/a-successful-git-branching-model/), gained a lot of attention, despite its complexity:
-
-![view on github.com](./img/hmsrcght-gitflow.png)
-
-Well. OK.
-
-So, [Github Flow](https://guides.github.com/introduction/flow/) emerged as a simplified alternative to Git Flow.
-
-And simple it is. Now that our repo is up on Github, let's utilize Github Flow for our project.
+As teams began making Git a core part of the development process, several Git workflows became popular. One in particular, [Git Flow](http://nvie.com/posts/a-successful-git-branching-model/), gained a lot of attention, despite its complexity. A simpler approach known as [Github Flow](https://guides.github.com/introduction/flow/) really emerged over time and is now the most popular approach. And simple it is. Now that our repo is up on Github, let's utilize Github Flow for our project.
 
 ## Github Issues
 
@@ -520,7 +528,7 @@ I also wanted to add a few comments about `.gitignore`.
 
 It is really important to note that researchers dealing with data subject to legal restrictions that prohibit sharing (such as medical data) should be careful not to put sensitive data into repositories.
 
-Also, be extra careful not to accidentally put credentials, such as passwords and private keys, into repositories.
+Also, be extra careful not to accidentally put credentials, such as passwords and private keys, into repositories. This is so often repeated, yet we continue to hear news stories all the time about this. The latest is an [Uber breach](https://www.wired.com/story/uber-paid-off-hackers-to-hide-a-57-million-user-data-breach/) where 57 million users were affected.
 
 Additionally, intermediate data files and other results that can be re-generated from raw data need not be added to version control.
 
@@ -530,19 +538,15 @@ Adding a .gitignore file to your repo is a good way to help ensure you don't ina
 
 So I wanted to quickly show you how a Github Organization like [HMS Resource Computing](https://github.com/hmsrc) can really improve collaboration.
 
-You can organize your collaborators into teams and then assign whole teams granular access to your repositories. You can grant read, write, and admin priviledges to each repository.
+You can organize your collaborators into teams and then assign whole teams granular access to your repositories. You can grant read, write, and admin privileges to each repository.
 
 ![Teams](./img/hmsrcght-teams.png)
 
-Many of our repositories have thousands of commits. You can track issues, as we've seen, contributions:
+Github is consistently adding additional access controls and new ways to collaborate. This past week, [Team Discussions](https://github.com/blog/2471-introducing-team-discussions) were introduced. While I haven't used the new functionality (we currently use Slack for all team communications), we do use Github alot for collaboration.
 
-![Contrib](./img/hmsrcght-contrib.png)
+We use Github Issues alot. We use Issues to track progress when diagnosing technical problems, and developing new features, etc.
 
-and many other things. You can use Trello-style Kanban boards for light weight project management:
-
-![Kanban](./img/hmsrcght-kanban.png)
-
-I feel like I'm forgetting an important collaboration feature.
+I feel like there is some important collaboration feature I'm forgetting...
 
 ## Oh yeah, Emoji :+1:
 
@@ -557,7 +561,7 @@ I wanted to leave some time open for questions and answers. For questions we can
 
 ## Contact information
 
-- [Orchestra New User Guide](https://wiki.med.harvard.edu/Orchestra/NewUserGuide)
+- [O2 Wiki](https://wiki.rc.hms.harvard.edu:8443/display/O2/O2)
 - [HMS RC website](http://rc.hms.harvard.edu)
 - [rchelp@hms.harvard.edu](mailto:rchelp@hms.harvard.edu)
 - Office Hours: Wednesdays 1-3p Gordon Hall 500
