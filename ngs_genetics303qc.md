@@ -254,6 +254,8 @@ The STAR scripts's contents are as follows:
 ```sh
 $ less scripts/star.run
 ```
+
+```sh
 #!/bin/bash
 #SBATCH -p short               #partition
 #SBATCH -t 0:30:00             #wall time
@@ -264,7 +266,7 @@ $ less scripts/star.run
 
 module load gcc/6.2.0 star/2.5.2b
 STAR --runThreadN 2 --genomeDir  dm6_star_indices --sjdbGTFfile dm6_star_indices/XXX.gtf --readFilesIn $1 $2 --outFileNamePrefix "${1%.*}"_star --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes NH HI NM MD AS --outReadsUnmapped Fastx --quantMode GeneCounts
-```sh
+```
 
 We will execute this script on each pair of reads (_1 and _2) by passing them as command line arguments ($1 and $2) to the sbatch script.
 
