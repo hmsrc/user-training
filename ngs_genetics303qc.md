@@ -119,7 +119,7 @@ fastq-dump --split-files $1                   #run fastq-dump (split paired end 
 executed as
 
 ```sh
-$ sbatch getSRA.run SRAnumbershere
+$ sbatch getSRA.run SRAnumberhere
 ```
 
 # RNA-seq processing exercise
@@ -131,9 +131,9 @@ We will be working with a small toy Drosophila dataset from GEO to familiarize y
 Create a directory in /n/scratch2 (10TB limit) called "ngsclass", change to it, and copy the class data files from /n/groups/rc-training/ngsclass to this directory
 
 ```sh
-mfk8@compute-a:~$ mkdir -p /n/scratch2/$USER/ngsclass
-mfk8@compute-a:~$ cd ngsclass
-mfk8@compute-a:~/ngsclass$ cp -r /n/groups/rc-training/ngsclass/* .
+mfk8@compute-a:~$ mkdir -p /n/scratch2/$USER/ngsclass               #create folder "ngsclass" in /n/scratch2 under your user name
+mfk8@compute-a:~$ cd ngsclass                                       #change directory to ngsclass
+mfk8@compute-a:~/ngsclass$ cp -r /n/groups/rc-training/ngsclass/* . #download all contents to current location (.)
 ```
 
 What is your data?
@@ -160,6 +160,7 @@ $ head g1_s1_1.fastq
 AAAATTACTTTTTATTAACCGTGTTTTCTTGGCCGTCAATTACGTTGCTTTTCTTTTCGCTGCGTTTCCGGAAGAGGATATTGAGTAGCACCGTTTCGGGCCCTTGGTCTTGGTCATTGTGCTGTTTAGCCCGAAACGGTGCTACTCAATATCCTCTTCCGGAAACGCAGCGAAAAGAAAAGCAACGTAATTGACGGCCAAG
 ...
 ```
+
 The SRA identity is found in the @ line.  You can search GEO for this SRR number to get more information on the experiment.
 
 
@@ -188,7 +189,7 @@ fastqc $1                   #command
 We sill execute this with a for loop saying for every file ending in .fastq, run fastqQC on it.
 
 ```sh
-$ for i in *.fastq; do sbatch scripts/fastQC.run $i; done
+$ for file in *.fastq; do sbatch scripts/fastQC.run $file; done
 ```
 We can check on these jobs status by running
 
@@ -223,9 +224,6 @@ These files are 89-91bp long, with Sanger 1.5 PHRED encoding.  They are of accep
 
 We will first use STAR to align these files to a reference genome,  and count the reads assigned to each gene.  STAR will create a .bam file, which is how the reads mapped, including mapping quality, and an counts file, which we will use to run the differential expression analysis.  
 
-
-```
-
 STAR relies on index files to speedily align to a reference genome.  These are STAR-parsed versions of the reference genome in a format that STAR can read.  Currenlty in O2, there are some STAR indices available, but we recommend creating your own using STAR genome-generate on the FASTAs (genomic sequence) and GTF file (annotation file) from the organism and build (UCSC, NCBI) that you choose. Here, the NCBI dm6 STAR indices were created and will be referenced out the "dm6_star_indices" folder you downloaded. 
 
 One of the key differences between UCSC and NCBI notation is how chromosomes are called.  In UCSC, the chromosome is called by "chr1", in Ensembl, it is just "1".  In order to use GTF annotation files on UCSC-aligned .bam files, the "chr" must first be stripped from the GTF file.
@@ -235,6 +233,7 @@ For this STAR alignment, we are considering the sequencing library prep to be un
 We will be utilizing multithreading to distribute the compute job over multiple cores (the --runThreadN option).  The majority of O2 machines have up to 32 cores available per node; 20 are permitted to be used for each multicore job.  The larger number of cores that are requested, the longer a job takes to dispatch, as resources are collected for the job. Performance does not scale linearly; the more cores requested does not mean that much speedup, many NGS algorithms top out at usage of 6-8 cores, and just require sufficient memory.
 
 The STAR  command format is: 
+```sh
 STAR 
 --runThreadN #numer of cores 
 --genomeDir #where the genome indices are located
@@ -246,7 +245,7 @@ STAR
 --outSAMattributes NH HI NM MD AS #extra BAM file attributes
 --outReadsUnmapped Fastx #write unmapped reads to a FASTX, can be used for blastn/downstream triage
 --quantMode GeneCounts #count reads assigned to each gene
-
+```
 
 We will be mirroring the resource request options in our sbatch (-runThreadN 2 cores requested in STAR, -c 2 cores requested in O2 bsub).  As a good practice, we are creating error and output files, where %j inserts the jobid that O2 allocates.  These error and output files (logs) will be collected in a directory we create called "star_logs" 
 
@@ -288,6 +287,7 @@ How did the alignment perform?  The summary of the alignment is "XXX".
 Let's take a look at the summary statistics for group 1, sample 1:
 
 ```sh
+xxx
 ```
 
 If we'd like to visualize our reads, we need to create a BAM index file (bai).  Samtools is a multi-purpose tool for manipulating SAM/BAM files and getting statistics.  Here, we will use samtools to index the aligned BAM files.
