@@ -108,7 +108,7 @@ The GeneOmnibus Respository contains a wealth of 'seq experiments, stored as SRA
 getSRA.run
 
 ```sh
-#!/bin/bash                     #shebang, always the first line
+#!/bin/bash                     
 #SBATCH -p short                #short partition
 #SBATCH -t 0-1:00               #1 hour time limit
 #SBATCH -e %j.err               #error log
@@ -179,7 +179,7 @@ $ less scripts/fastQC.run
 ```
 
 ```
-#!/bin/bash                 #shebang, always the first line
+#!/bin/bash                 
 #SBATCH -p priority         #partition
 #SBATCH -t 0-00:05          #time limit, 5min
 #SBATCH --mem 8G            #memory requested
