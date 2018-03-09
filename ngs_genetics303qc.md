@@ -1,39 +1,38 @@
 # HMS Research Computing: Intro to Next-Gen Sequencing Technologies Part II
 
-This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Spring 2017 for HMS Genetics 303qc.  It provides an Orchestra HPC environment-oriented workflow for RNA-seq analysis.
+This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Spring 2018 for HMS Genetics 303qc.  It provides an O2 HPC environment-oriented workflow for RNA-seq analysis.
 
-### Logging into Orchestra
+### Logging into O2
 
-Orchestra is the Harvard Medical School High-Performance Compute environment.  With over 8000 cores, 42 TB of RAM and 32 PB attached netework storage, Orchestra is designed to meet the demands of next-generation sequence analysis.  Orchestra allows users to leverage the power of compute across multiple cores in a highly scalable manner.
+O2 is the Harvard Medical School High-Performance Compute environment.  With over 8000 cores, 42 TB of RAM and 32 PB attached netework storage, O2 is designed to meet the demands of next-generation sequence analysis.  O2 allows users to leverage the power of compute across multiple cores in a highly scalable manner.
 
-Orchestra user accounts can be created for anyone with an eCommons ID.  To have an account created, visit
-http://rc.hms.harvard.edu/#orchestra
+O2 user accounts can be created for anyone with an eCommons ID.  To have an account created, visit
+http://rc.hms.harvard.edu/#cluster
 and fill out the account request form.
 
-To log into Orchestra, 
+To log into O2, 
 
    * Mac: from the terminal, type
    ```
-   ssh -l userid orchestra.med.harvard.edu
+   ssh yourEcommons@o2.hms.harvard.edu
    ```
-   * Windows: from PuTTY, type in  "Host Name"
+   * Windows: from MobaXterm, tupe
    ```
-   orchestra.med.harvard.edu
+   ssh yourEcommons@o2.hms.harvard.edu
    ```
-   and use your eCommons ID and password
    * Linux: from the terminal, type
    ```
-   ssh -l userid orchestra.med.harvard.edu
+   ssh yourEcommons@o2.hms.harvard.edu
    ```
 
 ### Welcome!
 
-Now on the shell login servers (loge/mezzanine/gallery/pit), please don't do computationally-heavy work here!
-Instead, launch an interactive session to work on a compute node (clarinets, ottavinos, fifes, ocarinas, piccolos, etc)
+Now on the shell login servers (login01-05), please don't do computationally-heavy work here!
+Instead, launch an interactive session to work on a compute node (compute-a, compute-e etc)
 
 ```sh
-mfk8@loge:~$ bsub -Is -q interactive bash
-mfk8@clarinet002:~$
+mfk8@login01:~$ srun --pty -p interactive -t 0-12:00 --mem 8G bash
+mfk8@compute-a:~$
 ```
 
 ### Linux 101
@@ -50,58 +49,55 @@ head = Display the first 10 lines
 tail = Display the last 10 lines
 ```
 
-### Orchestra Jobs
+### O2 Jobs
 
-Users do their computations on the cluster by submitting jobs (bsubs) to LSF, the cluster scheduler.  LSF identifies the resources needed and queues up jobs, giving priority to users with higher fairshare (they have submitted less jobs), to queues with shorter time limits, and to jobs with smaller resource requirements.  
+Users do their computations on the cluster by submitting jobs (sbatchs) to SLURM, the cluster scheduler.  SLURM identifies the resources needed and queues up jobs, giving priority to users with higher fairshare (they have submitted less jobs), to partitions with shorter time limits, and to jobs with smaller resource requirements.  
 
-Jobs are submitted with a "bsub", and always require
-* -q a queue #see table below
-* -W a wall time #jobs are killed once they exceed this limit
+Jobs are submitted with a "sbatch", and always require
+* -p a partition #see table below
+* -t a wall time #jobs are killed once they exceed this limit
 
 | Queue Name | Max Cores | Max Runtime | Best for |
 | ---------- | --------- | ----------- | -------- |
-| interactive| 12 | 12hr | programming, interactive use |
+| interactive| 20 | 12hr | programming, interactive use |
 | priority | 20 | 1 month | urgent jobs (2 max) |
-| mcore | 20 | 1 month | multi-core jobs |
-| mpi | 512 | 1 month | Large jobs with special parallel code |
-| short | 12 | 12 hr | short single-core jobs |
-| medium | 12 | 5 days | medium single-core jobs |
-| mini | 1 | 10min | very short single-core jobs |
-| long | 12 | 1 month | long single-core jobs |
+| short | 20 | 12 hr | short single-core jobs |
+| medium | 20 | 5 days | medium single-core jobs |
+| long | 20 | 1 month | long single-core jobs |
+| mpi | 640 | 1 month | large jobs with special parallel code |
+| gpu | - | 72 hours | GPU jobs |
+| transfer | 4 | 5 days | Moving files to O2 from research.files |
+| highmem | 20 | 1 TB | Large memory jobs |
 
 additional options include
-* -n number of course requested #most compute nodes have 12 cores, a small subset has 20
-* -R "select[mem=16000]" memory request #most machines have 90GB free, a small subset has 120GB
-* -e %J.err errorfile with jobid inserted
-* -o %J.out outfile with  jobid inserted
-* -N job completion notification
+* -c number of course requested #max 20
+* --mem  memory request #most machines have 90GB free, a small subset has 120GB
+* -e %j.err errorfile with jobid inserted
+* -o %j.out outfile with  jobid inserted
 
-### Software on Orchestra
+### Software on O2
 
-Orchestra uses environment modules to manage software and add the appropriate files to a user's PATH.  Environment modules source the most current directories for programs, and solve co-dependencies by loading dependent software.  
+O2 uses LMOD modules to manage software and add the appropriate files to a user's PATH.  Environment modules source the most current directories for programs, and solve co-dependencies by loading dependent software.  
 
 ```sh
-mfk8@clarinet002:~$ module avail                    #see all software available
-mfk8@clarinet002:~$ module avail seq                #see only seq software
-mfk8@clarinet002:~$ module load seq/fastqc/0.11.3   #load software into your environment
-mfk8@clarinet002:~$ module list                     #list all currently loaded modules
-mfk8@clarinet002:~$ module unload seq/fastqc/0.11.3 #unload software
-mfk8@clarinet002:~$ module list                     #list all currently loaded modules
-mfk8@clarinet002:~$ module purge                    #unlod all modules
+mfk8@compute-a:~$ module spider                         #see all software available
+mfk8@compute-a:~$ module load gcc/6.2.0 star/2.5.2b     #load software into your environment
+mfk8@compute-a:~$ module list                           #list all currently loaded modules
+mfk8@compute-a:~$ module unload star/2.5.2b             #unload software
+mfk8@compute-a:~$ module purge                          #unlod all modules
 ```
 
 ### Monitoring Jobs on Orchestra
 ```sh
 
-mfk8@clarinet002:~$ bjobs           #lists all jobs I have running/pending
-mfk8@clarinet002:~$ bjobs -l jobid  #gives command used for job
-mfk8@clarinet002:~$ bkill jobid     #kills job
-mfk8@clarinet002:~$ bkill 0         #kills all jobs
+mfk8@compute-a:~$ squeue -u $USER                                         #lists all jobs I have running/pending
+mfk8@compute-a:~$ sacct -u $USER --format=JobID,JobName,MaxRSS,Elapsed    #accounting detials
+mfk8@compute-a:~$ scancel jobid                                           #kills job
 ```
 
 ### Getting Data To/From Orchestra
 
-You can use an sFTP client to download files to your laptop/desktop. RC recommends "FileZilla," which works on all platforms. Login is to transfer.orchestra.med.harvard.edu, and files can be dragged and dropped to-from Orchestra.  Simple directory manipulations can also be performed via the GUI, but a "refresh" is required to see the effects.
+You can use an sFTP client to download files to your laptop/desktop. RC recommends "FileZilla," which works on all platforms. Login is to transfer.o2.med.harvard.edu, and files can be dragged and dropped to-from O2.  Simple directory manipulations can also be performed via the GUI, but a "refresh" is required to see the effects.
 
 https://filezilla-project.org/
 
@@ -116,23 +112,23 @@ $ bsub -q short -W 1:00 "fastq-dump SRRXXXXX"
 
 # RNA-seq processing exercise
 
-We will be working with a small toy Drosophila dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs.  Then we will align these files to the dm3 genome with a popular aligner, TopHat. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, We will download our aligned files to a personal machine.  We will then collapse the alignments into read counts files using HTSeq, to prepare them for downstream differential expression analysis using tools available in R.
+We will be working with a small toy Drosophila dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs, and coallte the reports with MultiQC.  Then we will align these files to the dm3 genome with a popular aligner, STAR. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, We will download our aligned files to a personal machine. We will perform for downstream differential expression analysis using tools available in R using the edgeR package.
 
 ### Class datafiles
 
-Create a directory called "ngsclass", change to it, and copy the class data files from /groups/rc-training/ngsclass to this directory
+Create a directory in /n/scratch2 (10TB limit) called "ngsclass", change to it, and copy the class data files from /n/groups/rc-training/ngsclass to this directory
 
 ```sh
-mfk8@clarinet002:~$ mkdir ngsclass
-mfk8@clarinet002:~$ cd ngsclass
-mfk8@clarinet002:~/ngsclass$ cp /groups/rc-training/ngsclass/* .
+mfk8@compute-a:~$ mkdir -p /n/scratch2/$USER/ngsclass
+mfk8@compute-a:~$ cd ngsclass
+mfk8@compute-a:~/ngsclass$ cp -r /n/groups/rc-training/ngsclass/* .
 ```
 
 What is your data?
 
 ```sh 
 
-mfk8@clarinet002:~/ngsclass$ ls -lh
+mfk8@compute-a:~/ngsclass$ ls -lh
 -rw-rw-r-- 1 kmh40 rccg 101288017 Feb 26 13:01 g1_s1_1.fastq
 -rw-rw-r-- 1 kmh40 rccg 101288017 Feb 26 13:01 g1_s1_2.fastq
 -rw-rw-r-- 1 kmh40 rccg 102040204 Feb 26 13:01 g1_s2_1.fastq
@@ -157,13 +153,29 @@ The SRA identity is found in the @ line.  You can search GEO for this SRR number
 
 ### QC Check: FastQC
 
-A quick QC check will identify problems with the quality of the reads, identify adapter/barcode sequence, kmers, and more.  FastQC is the standard for performing efficient QC checks.  It creates an html report for each file.  These html reports are best downloaded and viewed on a personal computer.  
+A quick QC check will identify problems with the quality of the reads, identify adapter/barcode sequence, kmers, and more.  FastQC is the standard for performing efficient QC checks.  It creates an html report for each file.  We will agregate the reports togetherusing MultiQC.  These html reports are best downloaded and viewed on a personal computer.  
 
-We will submit jobs to Orchestra to perform FastQC.  This program will take less than 5 minutes to complete, and only requires 1 core, so the jobs belong in the "short" queue.  However, since we only have a few jobs to run, and 2 can run at a time in the "priority" queue with little to no pend time, we will run our jobs there.  With a simple "for" loop, we can submit all of the jobs at once, by looping through all of the files ending in ".fastq" in the directory.
+We will submit jobs to O2 to perform FastQC.  This program will take less than 5 minutes to complete, and only requires 1 core with 8GB of memory, so the jobs belong in the "short" queue.  However, since we only have a few jobs to run, and 2 can run at a time in the "priority" queue with little to no pend time, we will run our jobs there.  With a simple "for" loop, we can submit all of the jobs at once, by looping through all of the files ending in ".fastq" in the directory.
+
+The sbatch scripts for these lessons are contained in your "scripts" folder.  To interface with the scheduler, we wrap up our commands into a script, and submit that script to the scheduler.  These scripts can take additional command line arguments (like file names, or options), and can be passed after the script name in numerical order as $1, $2, etc.
+
+The contents of fastQC.run can be viewed with
 
 ```sh
-$ module load seq/fastqc/0.11.3 
-$ for i in *.fastq; do bsub -q priority -W 5 fastqc $i; done
+$ less scripts/fastQC.run
+```
+
+```
+#!/bin/bash                 #shebang, always the first line
+#SBATCH -p priority         #partition
+#SBATCH -t 0-00:05          #time limit, 5min
+#SBATCH --mem 8G            #memory requested
+module load fastqc/0.11.3   #software to use
+fastqc $1                   #command
+```
+
+```sh
+$ for i in *.fastq; do sbatch scripts/fastQC.run $i; done
 ```
 
 We will download these files to our personal computers to view them.  In FileZilla, navigate to your "ngsclass" folder, and drag and drop the files labeled below to a location on your computer.
