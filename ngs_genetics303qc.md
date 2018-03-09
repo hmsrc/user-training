@@ -265,7 +265,7 @@ $ less scripts/star.run
 #SBATCH -e star_logs'%j.err    #job error logs
 
 module load gcc/6.2.0 star/2.5.2b
-STAR --runThreadN 2 --genomeDir  dm6_star_indices --sjdbGTFfile dm6_star_indices/XXX.gtf --readFilesIn $1 $2 --outFileNamePrefix "${1%.*}"_star --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes NH HI NM MD AS --outReadsUnmapped Fastx --quantMode GeneCounts
+STAR --runThreadN 2 --genomeDir  BDGP6_star_88 --sjdbGTFfile BDGP6_star_88/Drosophila_melanogaster.BDGP6.91.gtf --readFilesIn $1 $2 --outFileNamePrefix "${1%.*}"_star --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes NH HI NM MD AS --outReadsUnmapped Fastx --quantMode GeneCounts
 ```
 
 We will execute this script on each pair of reads (_1 and _2) by passing them as command line arguments ($1 and $2) to the sbatch script.
