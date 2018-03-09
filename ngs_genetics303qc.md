@@ -61,9 +61,9 @@ Jobs are submitted with a "sbatch", and always require
 | ---------- | --------- | ----------- | -------- |
 | interactive| 20 | 12hr | programming, interactive use |
 | priority | 20 | 1 month | urgent jobs (2 max) |
-| short | 20 | 12 hr | short single-core jobs |
-| medium | 20 | 5 days | medium single-core jobs |
-| long | 20 | 1 month | long single-core jobs |
+| short | 20 | 12 hr | short single/multicore jobs |
+| medium | 20 | 5 days | medium single/multicore jobs |
+| long | 20 | 1 month | long single/multicore jobs |
 | mpi | 640 | 1 month | large jobs with special parallel code |
 | gpu | - | 72 hours | GPU jobs |
 | transfer | 4 | 5 days | Moving files to O2 from research.files |
@@ -91,7 +91,7 @@ mfk8@compute-a:~$ module purge                          #unlod all modules
 ```sh
 
 mfk8@compute-a:~$ squeue -u $USER                                         #lists all jobs I have running/pending
-mfk8@compute-a:~$ sacct -u $USER --format=JobID,JobName,MaxRSS,Elapsed    #accounting detials
+mfk8@compute-a:~$ sacct -u $USER --format=JobID,JobName,MaxRSS,Elapsed    #accounting details
 mfk8@compute-a:~$ scancel jobid                                           #kills job
 ```
 
@@ -105,9 +105,21 @@ https://filezilla-project.org/
 
 The GeneOmnibus Respository contains a wealth of 'seq experiments, stored as SRA archives.  With the tool "sratoolkit", these can be downloaded and extracted into the native .fastq format, using the command "fastq-dump".  A sample command for downloading an SRA, as a job, looks like this:
 
+getSRA.run
+
 ```sh
-$ module load seq/sratoolkit/2.5.2
-$ bsub -q short -W 1:00 "fastq-dump SRRXXXXX"
+#!/bin/bash                     #shebang, always the first line
+#SBATCH -p short                #short partition
+#SBATCH -t 0-1:00               #1 hour time limit
+#SBATCH -e %j.err               #error log
+#SBATCH -o %j.out               #out log
+module load sratoolkit/2.8.1    #load module
+fastq-dump --split-files $1                   #run fastq-dump (split paired end fastq) on command line input file name
+```
+executed as
+
+```sh
+$ sbatch getSRA.run SRAnumbershere
 ```
 
 # RNA-seq processing exercise
@@ -128,7 +140,7 @@ What is your data?
 
 ```sh 
 
-mfk8@compute-a:~/ngsclass$ ls -lh
+mfk8@compute-a:/n/scratch2/mfk8/ngsclass$ ls -lh
 -rw-rw-r-- 1 kmh40 rccg 101288017 Feb 26 13:01 g1_s1_1.fastq
 -rw-rw-r-- 1 kmh40 rccg 101288017 Feb 26 13:01 g1_s1_2.fastq
 -rw-rw-r-- 1 kmh40 rccg 102040204 Feb 26 13:01 g1_s2_1.fastq
@@ -173,13 +185,26 @@ $ less scripts/fastQC.run
 module load fastqc/0.11.3   #software to use
 fastqc $1                   #command
 ```
+We sill execute this with a for loop saying for every file ending in .fastq, run fastqQC on it.
 
 ```sh
 $ for i in *.fastq; do sbatch scripts/fastQC.run $i; done
 ```
+We can check on these jobs status by running
 
+```sh
+$ squeue -u $USER
+```
+
+Once these jobs are all finished running, we can aggregate the reports together with MultiQC.  This takes our 8 fastq.html reports, and creates a master report.  Since we're in an interactive session (terminal says compute-a or compute-e), we can load the MultiQC module directly and run, it takes less than a minute
+
+```sh
+$ module load gcc/6.2.0 python/2.7.12 multiqc/1.3
+$ multiqc . #runs multiqc on all fastqc files in the directory
+```
 We will download these files to our personal computers to view them.  In FileZilla, navigate to your "ngsclass" folder, and drag and drop the files labeled below to a location on your computer.
 ```sh
+multiqc_report.html
 g1_s1_1.fastqc.html
 g1_s1_2.fastqc.html
 g1_s2_1.fastqc.html
@@ -194,149 +219,116 @@ To view, open your file exploring manager and double-click on the .html report. 
 
 These files are 89-91bp long, with Sanger 1.5 PHRED encoding.  They are of acceptable quality, with good GC content and few repeated sequences.  These files are not good candidates for trimming, so we can proceed with the alignment.
 
-### TopHat2 Alignment
+### STAR Alignment
 
-We will first use TopHat2 to align these files to a reference genome,  and annotate them.  TopHat2 relies on its partner program Bowtie1/2 to do the alignment, while TopHat2 maps splice junctions, transcription start sites, and novel isoforms.  
+We will first use STAR to align these files to a reference genome,  and count the reads assigned to each gene.  STAR will create a .bam file, which is how the reads mapped, including mapping quality, and an counts file, which we will use to run the differential expression analysis.  
 
-We will first load the TopHat2/Bowtie2 modules, along with Samtools.  Note all of the other software co-loaded by Orchestra, to solve dependency issues.
-
-```sh
-$ module load seq/tophat/2.1.0 seq/bowtie/2.1.0 seq/samtools/1.2
-$ module list
-Currently Loaded Modulefiles:
-  1) dev/java/jdk1.8          4) atlas/3.10.2             7) utils/hdf5/1.8.15       10) seq/samtools/1.2
-  2) seq/fastqc/0.11.3        5) dev/compiler/gcc-4.8.5   8) dev/python/2.7.6
-  3) seq/bowtie/2.1.0         6) utils/zlib/1.2.8         9) seq/tophat/2.1.0
 
 ```
 
-Bowtie relies on index files to speedily align to a reference genome.  These are Bowtie-parsed versions of the reference genome in a format that Bowtie can read.  Bowtie1 index files end in .ebwt, and Bowtie2 index files end in .bt2 .  We are using Bowtie2.  The Illumina igenome project created Bowtie index files for common genomes to standard reference genomes.  In Orchestra, these are located in /groups/shared_databases/igenomes/organism .  For Bowtie2 indexes for hg19, hg18, mm10, mm9, and dm3, we have created a softlink that points directly to these igenome Bowtie2 indexes that are located in /groups/shared_databases/igenome/organism/UCSC/version/Sequence/Bowtie2Index, and can just be referenced as "dm3", "hg19" etc.  
+STAR relies on index files to speedily align to a reference genome.  These are STAR-parsed versions of the reference genome in a format that STAR can read.  Currenlty in O2, there are some STAR indices available, but we recommend creating your own using STAR genome-generate on the FASTAs (genomic sequence) and GTF file (annotation file) from the organism and build (UCSC, NCBI) that you choose. Here, the NCBI dm6 STAR indices were created and will be referenced out the "dm6_star_indices" folder you downloaded. 
 
 One of the key differences between UCSC and NCBI notation is how chromosomes are called.  In UCSC, the chromosome is called by "chr1", in Ensembl, it is just "1".  In order to use GTF annotation files on UCSC-aligned .bam files, the "chr" must first be stripped from the GTF file.
 
-For this TopHat2 alignment, we are considering the sequencing library prep to be unstranded.
+For this STAR alignment, we are considering the sequencing library prep to be unstranded.
 
-We will be utilizing multithreading to distribute the compute job over multiple cores (the -p option).  The majority of Orchestra machines have up to 12 cores available per node; a small subset have 20 or more.  The larger number of cores that are requested, the longer a job takes to dispatch, as resources are collected for the job.  
+We will be utilizing multithreading to distribute the compute job over multiple cores (the --runThreadN option).  The majority of O2 machines have up to 32 cores available per node; 20 are permitted to be used for each multicore job.  The larger number of cores that are requested, the longer a job takes to dispatch, as resources are collected for the job. Performance does not scale linearly; the more cores requested does not mean that much speedup, many NGS algorithms top out at usage of 6-8 cores, and just require sufficient memory.
 
-The TopHat command format is: tophat -p processors -o outputdirectory path/to/genomeIndexFiles read1.fastq (read2.fastq) .  Each TopHat run needs its own directory to write its output files to, since the output all follow the same generic naming convention (like align_summary.txt, accepted_hits.bam).
+The STAR  command format is: 
+STAR 
+--runThreadN #numer of cores 
+--genomeDir #where the genome indices are located
+--sjdbGTFfile #where the GTF file is located
+--readFilesIn read1.fastq read2.fastq #for non-zipped files
+--outFileNamePrefix "${1%.*}"_star #take Read 1, strip the suffix, and name all output files with this convention + "star" 
+--outSAMtype BAM SortedByCoordinate #write an aligned BAM file and sort in chromosomal order
+--outSAMunmapped Within #retain unmapped reads in the BAM file
+--outSAMattributes NH HI NM MD AS #extra BAM file attributes
+--outReadsUnmapped Fastx #write unmapped reads to a FASTX, can be used for blastn/downstream triage
+--quantMode GeneCounts #count reads assigned to each gene
 
-We will be mirroring the resource request options in our bsub (-p 4 cores requested in TopHat, -n 4 cores requested in Orchestra bsub).  As a good practice, we are creating error and output files, where %J inserts the jobid that Orchestra allocates.  These error and output files (logs) will be collected in a directory we create called "tophat_logs".  
 
-```sh
-$ mkdir tophat_logs
-$ mkdir tophat_g1_s1
-$ bsub -q mcore -W 1:00 -n 4 -o ./tophat_logs/%J.out -e ./tophat_logs/%J.err -N "tophat -p 4 -o ./tophat_g1_s1 dm3 g1_s1_1.fastq g1_s1_2.fastq"
-$ mkdir tophat_g1_s2
-$ bsub -q mcore -W 1:00 -n 4 -o ./tophat_logs/%J.out -e ./tophat_logs/%J.err -N "tophat -p 4 -o ./tophat_g1_s2 dm3 g1_s2_1.fastq g1_s2_2.fastq"
-$ mkdir tophat_g2_s1
-$ bsub -q mcore -W 1:00 -n 4 -o ./tophat_logs/%J.out -e ./tophat_logs/%J.err -N "tophat -p 4 -o ./tophat_g2_s1 dm3 g2_s1_1.fastq g2_s1_2.fastq"
-$ mkdir tophat_g2_s2
-$ bsub -q mcore -W 1:00 -n 4 -o ./tophat_logs/%J.out -e ./tophat_logs/%J.err -N "tophat -p 4 -o ./tophat_g2_s2 dm3 g2_s2_1.fastq g2_s2_2.fastq"
-```
+We will be mirroring the resource request options in our sbatch (-runThreadN 2 cores requested in STAR, -c 2 cores requested in O2 bsub).  As a good practice, we are creating error and output files, where %j inserts the jobid that O2 allocates.  These error and output files (logs) will be collected in a directory we create called "star_logs" 
 
-Where are your aligned files?  For each analysis, you created a folder called tophat_gX_sX, and the aligned file is called "accepted_hits.bam".  The summary of the alignment is "align_summary.txt:, and the insertions, deletions, and splice junctions are bed coordinates files named accordingly.  Information on job runtime/success/errors is found in the folder "tophat_logs", by jobid.  Look at these files by "less tophat_logs/JOBID.err" to view.
-
-First, let's copy all the "acccepted_hits.bam" files to their actual names.   Then, we let's create .bai (.bam index files) for each TopHat hit.  These will be necessary for visualization.  This job takes about a minute to run, so we're placing it in the "short" queue.
+The STAR scripts's contents are as follows:
 
 ```sh
-# from root data directory
-$ cp  tophat_g1_s1/accepted_hits.bam tophat_g1_s1/tophat_g1_s1.bam
-$ bsub -q short -W 5 "samtools index tophat_g1_s1/tophat_g1_s1.bam"
-$ cp tophat_g1_s2/accepted_hits.bam tophat_g1_s2/tophat_g1_s2.bam
-$ bsub -q short -W 5 "samtools index tophat_g1_s2/tophat_g1_s2.bam"
-$ cp  tophat_g2_s1/accepted_hits.bam tophat_g2_s1/tophat_g2_s1.bam
-$ bsub -q short -W 5 "samtools index tophat_g2_s1/tophat_g2_s1.bam"
-$ cp tophat_g2_s2/accepted_hits.bam tophat_g2_s2/tophat_g2_s2.bam
-$ bsub -q short -W 5 "samtools index tophat_g2_s2/tophat_g2_s2.bam"
-
+$ less scripts/star.run
 ```
+#!/bin/bash
+#SBATCH -p short               #partition
+#SBATCH -t 0:30:00             #wall time
+#SBATCH -c 2                   #cores requested
+#SBATCH --mem 24G              #memory requested
+#SBATCH -o star_logs/%j.out    #job out logs
+#SBATCH -e star_logs'%j.err    #job error logs
 
-How did the aligment perform?  TopHat creates summary statistics for each run, called "align_summary.txt".
+module load gcc/6.2.0 star/2.5.2b
+STAR --runThreadN 2 --genomeDir  dm6_star_indices --sjdbGTFfile dm6_star_indices/XXX.gtf --readFilesIn $1 $2 --outFileNamePrefix "${1%.*}"_star --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes NH HI NM MD AS --outReadsUnmapped Fastx --quantMode GeneCounts
+```sh
+
+We will execute this script on each pair of reads (_1 and _2) by passing them as command line arguments ($1 and $2) to the sbatch script.
 
 ```sh
-# Here is the reported statistics for TopHat, g1_s1
-
-$ less tophat_g1_s1/align_summary.txt
-Left reads:
-          Input     :    500000
-           Mapped   :    500000 (100.0% of input)
-            of these:      5879 ( 1.2%) have multiple alignments (3374 have >20)
-Right reads:
-          Input     :    500000
-           Mapped   :    500000 (100.0% of input)
-            of these:      5879 ( 1.2%) have multiple alignments (3374 have >20)
-100.0% overall read mapping rate.
-
-Aligned pairs:    500000
-     of these:      5879 ( 1.2%) have multiple alignments
-                  500000 (100.0%) are discordant alignments
- 0.0% concordant pair alignment rate.
+$ mkdir star_logs
+$ sbatch scripts/star.run g1_s1_1.fq g1_s1_2.fq #group 1 sample 1 reads 1 and 2
+$ sbatch scripts/star.run g1_s2_1.fq g1_s2_2.fq #group 1 sample 2 reads 1 and 2
+$ sbatch scripts/star.run g2_s1_1.fq g2_s1_2.fq #group 2 sample 1 reads 1 and 2
+$ sbatch scripts/star.run g2_s2_1.fq g2_s2_2.fq #group 2 sample 2 reads 1 and 2
 ```
 
+We can monitor these jobs again with our "squeue" command
+```sh
+$ squeue -u $USER
+```
+
+Where are your aligned files?  For each pair of reads, STAR creates a .bam file (aligned reads) and ReadsPerGene.out.tab (counts file).  
+How did the alignment perform?  The summary of the alignment is "XXX".
+
+Let's take a look at the summary statistics for group 1, sample 1:
+
+```sh
+```
+
+If we'd like to visualize our reads, we need to create a BAM index file (bai).  Samtools is a multi-purpose tool for manipulating SAM/BAM files and getting statistics.  Here, we will use samtools to index the aligned BAM files.
+
+```sh
+$ less scripts/bamindex.run
+```
+
+```sh
+#!/bin/bash             #shebang, always at the top
+#SBATCH -p priority     #partition
+#SBATCH -t 0-00:10      #time, 10 minutes
+#SBATCH --mem 8G        #memory in GB
+#SBATCH -e bi.%j.err    #error logs
+#SBATCH -o bi.&j.out    #out logs
+module load gcc/6.2.0 samtools/1.3.1 #load module
+samtools index $1                     #index the command line argument
+```
+
+We can loop over all of our BAM files, submitting a priority job for each (2 can run at a time).
+
+```sh
+$ for bamfile in *.bam; do sbatch scripts/bamindex.run $bamfile; done
+```
+
+Once they're finished, we should now see 4 .bai (BAM index) files, one for each BAM file.
+
+```sh
+$ ls *.bai
+```
 ### Read Visualization with IGV
 
 BAM files and BED files can be visualized with the Java-based tool IGV.  IGV can be launched with larger instances of memory by modifying the .bat file; for this exercise, the default is fine. 
 
 First download the BAM files with their corresponding BAI folders to your computer, using FileZilla.  IGV needs both the .bam and its associated .bai to load properly.
 
-Then, launch IGV, and load the reference genome track (Genomes->Load Genome from Server->D. melanogaster (dm3)).  Now, you can load your BAM files (File->Load from File)
+Then, launch IGV, and load the reference genome track (Genomes->Load Genome from Server->D. melanogaster (dm6)).  Now, you can load your BAM files (File->Load from File)
 
 ![alt text](https://github.com/hmsrc/user-training/blob/master/igvshot.png "IGV Screenshot")
 
-### Read Counting with HTSeq
 
-
-The number of reads assigned to a gene feature can be turned into a counts file with htseq-count.  This Python tool relies on the GTF coordinates and annotation to assign a read to a gene.  Files must first be name sorted with Samtools to create a "*.sort.bam" file and can then be counted. We are assuming the experiments are not stranded. We are ordering on name (128up->zuc).
-
-```sh
-# Sort the TopHat experiment on name (-n)
-$ bsub -q short -W 5 "samtools sort -n tophat_g1_s1/tophat_g1_s1.bam tophat_g1_s1/tophat_g1_s1.sort"
-$ bsub -q short -W 5 "samtools sort -n tophat_g1_s2/tophat_g1_s2.bam tophat_g1_s2/tophat_g1_s2.sort"
-$ bsub -q short -W 5 "samtools sort -n tophat_g2_s1/tophat_g2_s1.bam tophat_g2_s1/tophat_g2_s1.sort"
-$ bsub -q short -W 5 "samtools sort -n tophat_g2_s2/tophat_g2_s2.bam tophat_g2_s2/tophat_g2_s2.sort"
-```
-
-```sh
-# Load htseq module
-$ module load seq/htseq/0.6.1
-
-# command reads: htseq-count options sortedBamFile.bam /path/to/GTF.gtf > output.txt
-
-$ bsub -q short -W 30 "htseq-count  --order=name --stranded=no --format=bam tophat_g1_s1/tophat_g1_s1.sort.bam /groups/shared_databases/igenome/Drosophila_melanogaster/UCSC/dm3_2L_2R/Annotation/Genes/genes.gtf > tophat_g1_s1/tophat_g1_s1.counts.txt"
-$ bsub -q short -W 30 "htseq-count  --order=name --stranded=no --format=bam tophat_g1_s2/tophat_g1_s2.sort.bam /groups/shared_databases/igenome/Drosophila_melanogaster/UCSC/dm3_2L_2R/Annotation/Genes/genes.gtf > tophat_g1_s2/tophat_g1_s2.counts.txt"
-$ bsub -q short -W 30 "htseq-count  --order=name --stranded=no --format=bam tophat_g2_s1/tophat_g2_s1.sort.bam /groups/shared_databases/igenome/Drosophila_melanogaster/UCSC/dm3_2L_2R/Annotation/Genes/genes.gtf > tophat_g2_s1/tophat_g2_s1.counts.txt"
-$ bsub -q short -W 30 "htseq-count  --order=name --stranded=no --format=bam tophat_g2_s2/tophat_g2_s2.sort.bam /groups/shared_databases/igenome/Drosophila_melanogaster/UCSC/dm3_2L_2R/Annotation/Genes/genes.gtf > tophat_g2_s2/tophat_g2_s2.counts.txt"
-```
-
-We can now verify that the counting worked by looking at the "head" and "tail" of our counts.txt files .  Note that the uncounted read statistics comprise the last 5 lines of this file.  These may need to be trimmed out in later downstream analyses.
-
-```sh
-$ head tophat_g1_s1/tophat_g1_s1.counts.txt
-128up   151
-14-3-3zeta      486
-18w     47
-5-HT1A  1
-5-HT1B  0
-A16     117
-ACXA    0
-ACXB    0
-ACXC    0
-ACXE    0
-
-$ tail tophat_g1_s1/tophat_g1_s1.counts.txt
-
-yuri    9
-zetaTry 13
-zf30C   207
-zip     415
-zuc     31
-__no_feature    5734
-__ambiguous     8461
-__too_low_aQual 0
-__not_aligned   0
-__alignment_not_unique  81056
-
-```
 ### Next Steps
 
-These read counts files can be aggregated in bash or R and run through popular R-based differential expression algorithms like edgeR and DESeq2, and used for sophisticated plotting.  The combined counts matrices can even be imported into programs like MS Excel for filtering, low-level statistics, and graphing.  It is of note that these counts files have not been normalized in any way; R-based Differential Expression algorithms control for effects based on library size, not gene length.  Gene length can be accounted for in functional enrichment analysis, using tools like the R-based GOSeq.  
+These read counts files can be aggregated read into R and run through popular R-based differential expression algorithms like edgeR and DESeq2, and used for sophisticated plotting.  The combined counts matrices can even be imported into programs like MS Excel for filtering, low-level statistics, and graphing.  It is of note that these counts files have not been normalized in any way; R-based Differential Expression algorithms control for effects based on library size or median expression, not gene length.  Gene length can be accounted for in functional enrichment analysis, using tools like the R-based GOSeq.  
