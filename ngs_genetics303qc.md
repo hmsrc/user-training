@@ -272,10 +272,10 @@ We will execute this script on each pair of reads (_1 and _2) by passing them as
 
 ```sh
 $ mkdir star_logs
-$ sbatch scripts/star.run g1_s1_1.fq g1_s1_2.fq #group 1 sample 1 reads 1 and 2
-$ sbatch scripts/star.run g1_s2_1.fq g1_s2_2.fq #group 1 sample 2 reads 1 and 2
-$ sbatch scripts/star.run g2_s1_1.fq g2_s1_2.fq #group 2 sample 1 reads 1 and 2
-$ sbatch scripts/star.run g2_s2_1.fq g2_s2_2.fq #group 2 sample 2 reads 1 and 2
+$ sbatch scripts/star.run g1_s1_1.fastq g1_s1_2.fastq #group 1 sample 1 reads 1 and 2
+$ sbatch scripts/star.run g1_s2_1.fastq g1_s2_2.fastq #group 1 sample 2 reads 1 and 2
+$ sbatch scripts/star.run g2_s1_1.fastq g2_s1_2.fastq #group 2 sample 1 reads 1 and 2
+$ sbatch scripts/star.run g2_s2_1.fastq g2_s2_2.fastq #group 2 sample 2 reads 1 and 2
 ```
 
 We can monitor these jobs again with our "squeue" command
