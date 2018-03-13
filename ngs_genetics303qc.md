@@ -16,7 +16,7 @@ To log into O2,
    ```
    ssh yourEcommons@o2.hms.harvard.edu
    ```
-   * Windows: from MobaXterm, tupe
+   * Windows: from MobaXterm, type
    ```
    ssh yourEcommons@o2.hms.harvard.edu
    ```
@@ -42,7 +42,7 @@ Create a directory in /n/scratch2 (10TB limit) called "ngsclass", change to it, 
 ```sh
 mfk8@compute-a:~$ mkdir -p /n/scratch2/$USER/ngsclass               #create folder "ngsclass" in /n/scratch2 under your user name
 mfk8@compute-a:~$ cd /n/scratch2/$USER/ngsclass                     #change directory to ngsclass
-mfk8@compute-a:~/ngsclass$ cp -r /n/groups/rc-training/ngsclass/* . #download all contents to current location (.)
+mfk8@compute-a:/n/scratch2/mfk8/ngsclass$ cp -r /n/groups/rc-training/ngsclass/* . #download all contents to current location (.)
 ```
 
 ### Linux 101
@@ -131,12 +131,12 @@ fastq-dump --split-files $1     #run fastq-dump (split paired end fastq) on comm
 executed as
 
 ```sh
-$ sbatch getSRA.run SRAnumberhere
+$ sbatch scripts/getSRA.run SRAnumberhere
 ```
 
 # RNA-seq processing exercise
 
-We will be working with a small, unpublished toy Mouse dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs, and coallte the reports with MultiQC.  Then we will align these files to the NCBI GRCm38 genome with a popular aligner, STAR. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, We will download our aligned files to a personal machine. We will perform for downstream differential expression analysis using tools available in R using the edgeR package.
+We will be working with a small, unpublished toy mouse dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs, and coallte the reports with MultiQC.  Then we will align these files to the NCBI GRCm38 genome with a popular aligner, STAR. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, we will download our aligned files to a personal machine. Last, we will use the counts files to perform differential expression analysis using the edgeR packgage in R.
 
 ### Inspecting data
 
