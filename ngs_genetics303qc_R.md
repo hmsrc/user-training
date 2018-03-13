@@ -105,18 +105,16 @@ library(biomaRt)
 mart = useEnsembl("ENSEMBL_MART_ENSEMBL")
 mart=useMart(biomart="ensembl", dataset="mmusculus_gene_ensembl")
 
-#read in files, ending in run1.txt or whatever pattern you have
-#can read in multiple files and convert
-
+#read in file ending in .run1
 files<-dir(pattern="*\\.run1.txt$")
 
-#for loop, takes a while to run if lists are large
-
-input<-files[1]
-df<-read.table(input, header=T, sep="\t")
-ensembl_ids<-df[,1]
+input<-files[1] #file 1
+df<-read.table(input, header=T, sep="\t") #read table
+ensembl_ids<-df[,1] #get ensembl ids, first column
 ids<-NULL
+#get gene name and ensembl gene for each ensembl id
 ids<-getBM(attributes=c("external_gene_name", "ensembl_gene_id"), filters="ensembl_gene_id", values=ensembl_ids, mart=mart) 
+#mrege together input with gene symbols, drops unannotated samples
 output<-merge(ids, df, by.x="ensembl_gene_id", by.y="Row.names")
 colnames(output)[1:2]<-c("Ensembl", "GeneID")
 filename<-gsub(".txt", ".ids.txt", input)
