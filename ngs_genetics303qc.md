@@ -145,8 +145,17 @@ What is your data?
 ```sh 
 
 mfk8@compute-a:/n/scratch2/mfk8/ngsclass$ ls -lh
-
-
+total 66G
+-rw-rw-r-- 1 kmh40 rccg 6.9G Mar 13 15:06 g1_s1_1.fastq
+-rw-rw-r-- 1 kmh40 rccg 6.9G Mar 13 15:08 g1_s1_2.fastq
+-rw-rw-r-- 1 kmh40 rccg 5.9G Mar 13 15:10 g1_s2_1.fastq
+-rw-rw-r-- 1 kmh40 rccg 5.9G Mar 13 15:11 g1_s2_2.fastq
+-rw-rw-r-- 1 kmh40 rccg 7.6G Mar 13 15:13 g2_s1_1.fastq
+-rw-rw-r-- 1 kmh40 rccg 7.6G Mar 13 15:14 g2_s1_2.fastq
+-rw-rw-r-- 1 kmh40 rccg 7.4G Mar 13 15:16 g2_s2_1.fastq
+-rw-rw-r-- 1 kmh40 rccg 7.4G Mar 13 15:16 g2_s2_2.fastq
+drwxrwsr-x 2 kmh40 rccg  516 Mar 13 17:42 GRCm38_star_125
+drwxrwsr-x 2 kmh40 rccg  150 Mar 13 17:46 scripts
 ```
 
 This is a Mouse fastq dataset, with 2 groups (g1/g2) with 2 samples each (s1/s2), paired end (_1, _2).  But really, what is your data?
