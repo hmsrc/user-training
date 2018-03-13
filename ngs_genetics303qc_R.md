@@ -17,7 +17,6 @@ biocLite("biomaRt")
 #initialize edgeR library (do every time)
 library(edgeR)
 
-
 #read in files, take columns 1 (annotation) and 2 (unstranded library prep), get rid of extra alignment report lines
 files=dir(pattern="*\\.tab$")
 dge<-readDGE(files, columns=c(1,2), header=FALSE)
@@ -48,7 +47,6 @@ plotMDS(norm, col=as.numeric(Group), main="MDS")
 dev.off()
 
 #to display as dots
-
 png("MDS_dots_run1.png")
 plotMDS(norm, col=as.numeric(Group), main="MDS", pch=18)
 dev.off()
@@ -66,7 +64,6 @@ dev.off()
 
 #fit the negative binomial, with Plus over Minus (2 over 1)
 et<-exactTest(tag, pair=2:1)
-
 
 #perform the decideTest, those making q<0.05
 summary(de <- decideTestsDGE(et))
@@ -97,7 +94,7 @@ abline(h=c(-1, 1), col="blue")
 dev.off()
 ```
 
-### biomArt Annotation pull
+### biomaRt Annotation pull
 
 Creates an additional output file with gene symbol information added (takes more time, and sometimes biomaRt is down)
 
@@ -109,18 +106,18 @@ mart = useEnsembl("ENSEMBL_MART_ENSEMBL")
 mart=useMart(biomart="ensembl", dataset="mmusculus_gene_ensembl")
 
 #read in files, ending in run1.txt or whatever pattern you have
+#can read in multiple files and convert
+
 files<-dir(pattern="*\\.run1.txt$")
 
 #for loop, takes a while to run if lists are large
 
-for (input in files){
-	df<-read.table(input, header=T, sep="\t")
-	ensembl_ids<-df[,1]
-	ids<-NULL
-	ids<-getBM(attributes=c("external_gene_name", "ensembl_gene_id"), filters="ensembl_gene_id", values=ensembl_ids, mart=mart) 
-	#output<-cbind(ids[,1], df[,1:ncol(df)])
-	output<-merge(ids, df, by.x="ensembl_gene_id", by.y="Row.names")
-	colnames(output)[1:2]<-c("Ensembl", "GeneID")
-	filename<-gsub(".txt", ".ids.txt", input)
-	write.table(output, file=filename, sep="\t", quote=FALSE, row.names=FALSE)
-}
+input<-files[1]
+df<-read.table(input, header=T, sep="\t")
+ensembl_ids<-df[,1]
+ids<-NULL
+ids<-getBM(attributes=c("external_gene_name", "ensembl_gene_id"), filters="ensembl_gene_id", values=ensembl_ids, mart=mart) 
+output<-merge(ids, df, by.x="ensembl_gene_id", by.y="Row.names")
+colnames(output)[1:2]<-c("Ensembl", "GeneID")
+filename<-gsub(".txt", ".ids.txt", input)
+write.table(output, file=filename, sep="\t", quote=FALSE, row.names=FALSE)
