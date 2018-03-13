@@ -41,7 +41,7 @@ Create a directory in /n/scratch2 (10TB limit) called "ngsclass", change to it, 
 
 ```sh
 mfk8@compute-a:~$ mkdir -p /n/scratch2/$USER/ngsclass               #create folder "ngsclass" in /n/scratch2 under your user name
-mfk8@compute-a:~$ cd ngsclass                                       #change directory to ngsclass
+mfk8@compute-a:~$ cd /n/scratch2/$USER/ngsclass                     #change directory to ngsclass
 mfk8@compute-a:~/ngsclass$ cp -r /n/groups/rc-training/ngsclass/* . #download all contents to current location (.)
 ```
 
@@ -115,7 +115,9 @@ https://filezilla-project.org/
 
 The GeneOmnibus Respository contains a wealth of 'seq experiments, stored as SRA archives.  With the tool "sratoolkit", these can be downloaded and extracted into the native .fastq format, using the command "fastq-dump".  A sample command for downloading an SRA, as a job, looks like this:
 
-getSRA.run
+```sh
+$ less scripts/getSRA.run
+```
 
 ```sh
 #!/bin/bash                     
@@ -134,7 +136,7 @@ $ sbatch getSRA.run SRAnumberhere
 
 # RNA-seq processing exercise
 
-We will be working with a small toy Drosophila dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs, and coallte the reports with MultiQC.  Then we will align these files to the dm3 genome with a popular aligner, STAR. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, We will download our aligned files to a personal machine. We will perform for downstream differential expression analysis using tools available in R using the edgeR package.
+We will be working with a small, unpublished toy Mouse dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs, and coallte the reports with MultiQC.  Then we will align these files to the NCBI GRCm38 genome with a popular aligner, STAR. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, We will download our aligned files to a personal machine. We will perform for downstream differential expression analysis using tools available in R using the edgeR package.
 
 ### Inspecting data
 
@@ -143,14 +145,7 @@ What is your data?
 ```sh 
 
 mfk8@compute-a:/n/scratch2/mfk8/ngsclass$ ls -lh
--rw-rw-r-- 1 kmh40 rccg 101288017 Feb 26 13:01 g1_s1_1.fastq
--rw-rw-r-- 1 kmh40 rccg 101288017 Feb 26 13:01 g1_s1_2.fastq
--rw-rw-r-- 1 kmh40 rccg 102040204 Feb 26 13:01 g1_s2_1.fastq
--rw-rw-r-- 1 kmh40 rccg 101959796 Feb 26 13:01 g1_s2_2.fastq
--rw-rw-r-- 1 kmh40 rccg 101540796 Feb 26 13:01 g2_s1_1.fastq
--rw-rw-r-- 1 kmh40 rccg 101459204 Feb 26 13:01 g2_s1_2.fastq
--rw-rw-r-- 1 kmh40 rccg 101288017 Feb 26 13:01 g2_s2_1.fastq
--rw-rw-r-- 1 kmh40 rccg 101197361 Feb 26 13:01 g2_s2_2.fastq
+
 
 ```
 
@@ -226,13 +221,13 @@ These files are 126-128bp long, with Sanger 1.9 PHRED encoding.  They are of acc
 
 We will first use STAR to align these files to a reference genome,  and count the reads assigned to each gene.  STAR will create a .bam file, which is how the reads mapped, including mapping quality, and an counts file, which we will use to run the differential expression analysis.  
 
-STAR relies on index files to speedily align to a reference genome.  These are STAR-parsed versions of the reference genome in a format that STAR can read.  Currenlty in O2, there are some STAR indices available, but we recommend creating your own using STAR genome-generate on the FASTAs (genomic sequence) and GTF file (annotation file) from the organism and build (UCSC, NCBI) that you choose. Here, the NCBI GRCm38, version 91 STAR indices with a splice junction overhang 125 (read length-1)were created and will be referenced out the "GRCm38_star_125" folder you downloaded. 
+STAR relies on index files to speedily align to a reference genome.  These are STAR-parsed versions of the reference genome in a format that STAR can read.  Currenlty in O2, there are some STAR indices available, but we recommend creating your own using STAR genome-generate on the FASTAs (genomic sequence) and GTF file (annotation file) from the organism and build (UCSC, NCBI) that you choose. Here, the NCBI GRCm38, version 91 STAR indices with a splice junction overhang 125 (read length-1) were created and will be referenced out the "GRCm38_star_125" folder you downloaded. 
 
 One of the key differences between UCSC and NCBI notation is how chromosomes are called.  In UCSC, the chromosome is called by "chr1", in Ensembl, it is just "1".  In order to use GTF annotation files on UCSC-aligned .bam files, the "chr" must first be stripped from the GTF file.
 
 For this STAR alignment, we are considering the sequencing library prep to be unstranded.
 
-We will be utilizing multithreading to distribute the compute job over multiple cores (the --runThreadN option).  The majority of O2 machines have up to 32 cores available per node; 20 are permitted to be used for each multicore job.  The larger number of cores that are requested, the longer a job takes to dispatch, as resources are collected for the job. Performance does not scale linearly; the more cores requested does not mean that much speedup, many NGS algorithms top out at usage of 6-8 cores, and just require sufficient memory.
+We will be utilizing multithreading to distribute the compute job over multiple cores (the --runThreadN option).  The majority of O2 machines have up to 32 cores available per node; 20 are permitted to be used for each multicore job.  The larger number of cores that are requested, the longer a job takes to dispatch, as resources are collected for the job. Performance does not scale linearly; the more cores requested does not mean that much speedup, many NGS algorithms top out at usage of 6-8 cores, and just require sufficient memory.  STAR typically just requires 2 cores and a fair bit (48G of memory).
 
 The STAR  command format is: 
 ```sh
@@ -267,7 +262,7 @@ $ less scripts/star.run
 #SBATCH -e star.%j.err         #job error logs
 
 module load gcc/6.2.0 star/2.5.2b
-STAR --runThreadN 2 --genomeDir  GRCm38_star_127 --sjdbGTFfile GRCm38_star_127/Mus_musculus.GRCm38.91.chr.gtf --readFilesIn $1 $2 --outFileNamePrefix "${1%.*}"_star --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes NH HI NM MD AS --outReadsUnmapped Fastx --quantMode GeneCounts
+STAR --runThreadN 2 --genomeDir  GRCm38_star_125 --sjdbGTFfile GRCm38_star_125/Mus_musculus.GRCm38.91.chr.gtf --readFilesIn $1 $2 --outFileNamePrefix "${1%.*}"_star --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes NH HI NM MD AS --outReadsUnmapped Fastx --quantMode GeneCounts
 ```
 
 We will execute this script on each pair of reads (_1 and _2) by passing them as command line arguments ($1 and $2) to the sbatch script.
@@ -369,14 +364,14 @@ First download the BAM files with their corresponding BAI folders to your comput
 
 Then, launch IGV, and load the reference genome track (Genomes->Load Genome from Server->M. musculus ()).  Now, you can load your BAM files (File->Load from File)
 
-![alt text](https://github.com/hmsrc/user-training/blob/master/igvshot.png "IGV Screenshot")
+![alt text](https://github.com/hmsrc/user-training/blob/master/trp53.igv.png "IGV Screenshot")
 
 
 ### Counts Files
 
 The counts files are the measure of how many read pairs are assigned to a gene.  There are three types of RNA-seq library prep that can used: unstranded (traditional), stranded, or reverse.  For this library prep, we will consider it to be an "unstranded" prep, since we have no other information.  This is column 2 of each counts file.
 
-*You'll need to use FileZilla to download each "_starReadsPerGene.out.tab" for each read pair in preparation for the next exercises*
+**You'll need to use FileZilla to download each "_starReadsPerGene.out.tab" for each read pair in preparation for the next exercises**
 
 ### Next Steps
 
