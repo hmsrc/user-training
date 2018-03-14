@@ -27,7 +27,7 @@ To log into O2,
 
 ### Welcome!
 
-Now on the shell login servers (login01-05), please don't do computationally-heavy work here!
+Now you're on the shell login servers (login01-05), please don't do computationally-heavy work here!
 Instead, launch an interactive session to work on a compute node (compute-a, compute-e etc)
 
 ```sh
@@ -164,6 +164,8 @@ This is a Mouse fastq dataset, with 2 groups (g1/g2) with 2 samples each (s1/s2)
 $ head g1_s1_1.fastq
 @SRR6725731.1 HISEQ:473:CB152ANXX:8:1101:2974:1993 length=126
 NTCTAGAGCTAATACATGCCGACGGGCGCTGACCCCCCTTCCCGGGGGGGGATGCGTGCATTTATCAGCCAGATCGGAAGGGCACACGTCTGAACTCCAGTCACCGTCTAACCACTACAGATCTCG
++SRR6725731.1 HISEQ:473:CB152ANXX:8:1101:2974:1993 length=126
+#<=@BFGGGEGGFGGGGGGGGGGGFGGGGGGGGGGGGGEBGGGGGGGGGGGGGGGGGGGGGD=EGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG9/DGG
 ...
 ```
 
@@ -172,9 +174,9 @@ The SRA identity is found in the @ line.  You can search GEO for this SRR number
 
 ### QC Check: FastQC
 
-A quick QC check will identify problems with the quality of the reads, identify adapter/barcode sequence, kmers, and more.  FastQC is the standard for performing efficient QC checks.  It creates an html report for each file.  We will aggregate the reports togetherusing MultiQC.  These html reports are best downloaded and viewed on a personal computer.  
+A quick QC check will identify problems with the quality of the reads, identify adapter/barcode sequence, kmers, and more.  FastQC is the standard for performing efficient QC checks.  It creates an html report for each file.  We will aggregate the reports together using MultiQC.  These html reports are best downloaded and viewed on a personal computer.  
 
-We will submit jobs to O2 to perform FastQC.  This program will take less than 5 minutes to complete, and only requires 1 core with 8GB of memory, so the jobs belong in the "short" queue.  However, since we only have a few jobs to run, and 2 can run at a time in the "priority" queue with little to no pend time, we will run our jobs there.  With a simple "for" loop, we can submit all of the jobs at once, by looping through all of the files ending in ".fastq" in the directory.
+We will submit jobs to O2 to perform FastQC.  This program will take less than 5 minutes to complete, and only requires 1 core with 8GB of memory, so the jobs belong in the "short" queue. With a simple "for" loop, we can submit all of the jobs at once, by looping through all of the files ending in ".fastq" in the directory.
 
 The sbatch scripts for these lessons are contained in your "scripts" folder.  To interface with the scheduler, we wrap up our commands into a script, and submit that script to the scheduler.  These scripts can take additional command line arguments (like file names, or options), and can be passed after the script name in numerical order as $1, $2, etc.
 
@@ -186,7 +188,7 @@ $ less scripts/fastQC.run
 
 ```
 #!/bin/bash                 
-#SBATCH -p priority         #partition
+#SBATCH -p short            #partition
 #SBATCH -t 0-00:05          #time limit, 5min
 #SBATCH --mem 8G            #memory requested
 module load fastqc/0.11.3   #software to use
@@ -203,7 +205,7 @@ We can check on these jobs status by running
 $ squeue -u $USER
 ```
 
-Once these jobs are all finished running, we can aggregate the reports together with MultiQC.  This takes our 8 fastq.html reports, and creates a master report.  Since we're in an interactive session (terminal says compute-a or compute-e), we can load the MultiQC module directly and run, it takes less than a minute
+Once these jobs are all finished running, we can aggregate the reports together with MultiQC.  This takes our 8 `fastq.html` reports, and we will create a master report `multiqc_report.html`.  Since we're in an interactive session (terminal says compute-a or compute-e), we can load the MultiQC module directly and run, it takes less than a minute
 
 ```sh
 $ module load gcc/6.2.0 python/2.7.12 multiqc/1.3
@@ -228,11 +230,11 @@ These files are 126-128bp long, with Sanger 1.9 PHRED encoding.  They are of acc
 
 ### STAR Alignment
 
-We will first use STAR to align these files to a reference genome,  and count the reads assigned to each gene.  STAR will create a .bam file, which is how the reads mapped, including mapping quality, and an counts file, which we will use to run the differential expression analysis.  
+We will first use STAR to align these files to a reference genome,  and count the reads assigned to each gene.  STAR will create a `.bam` file, which is how the reads mapped, including mapping quality, and a counts file, which we will use to run the differential expression analysis.  
 
 STAR relies on index files to speedily align to a reference genome.  These are STAR-parsed versions of the reference genome in a format that STAR can read.  Currenlty in O2, there are some STAR indices available, but we recommend creating your own using STAR genome-generate on the FASTAs (genomic sequence) and GTF file (annotation file) from the organism and build (UCSC, NCBI) that you choose. Here, the NCBI GRCm38, version 91 STAR indices with a splice junction overhang 125 (read length-1) were created and will be referenced out the "GRCm38_star_125" folder you downloaded. 
 
-One of the key differences between UCSC and NCBI notation is how chromosomes are called.  In UCSC, the chromosome is called by "chr1", in Ensembl, it is just "1".  In order to use GTF annotation files on UCSC-aligned .bam files, the "chr" must first be stripped from the GTF file.
+One of the key differences between UCSC and NCBI notation is how chromosomes are called.  In UCSC, the chromosome is called by "chr1", in NCBI/Ensembl, it is just "1".  In order to use GTF annotation from one format on the other, the "chr" must be added or deleted.
 
 For this STAR alignment, we are considering the sequencing library prep to be unstranded.
 
@@ -253,7 +255,7 @@ STAR
 --quantMode GeneCounts #count reads assigned to each gene
 ```
 
-We will be mirroring the resource request options in our sbatch (-runThreadN 2 cores requested in STAR, -c 2 cores requested in O2 bsub).  As a good practice, we are creating error and output files, where %j inserts the jobid that O2 allocates.  These error and output files (logs) will be collected in a directory we create called "star_logs" 
+We will be mirroring the resource request options in our sbatch (-runThreadN 2 cores requested in STAR, -c 2 cores requested in O2 bsub).  As a good practice, we are creating error and output files, where %j inserts the jobid that O2 allocates.  These error and output files (logs) will be collected in your working directory.
 
 The STAR scripts's contents are as follows:
 
@@ -264,9 +266,9 @@ $ less scripts/star.run
 ```sh
 #!/bin/bash
 #SBATCH -p short               #partition
-#SBATCH -t 0:30:00             #wall time
+#SBATCH -t 1:00:00             #wall time
 #SBATCH -c 2                   #cores requested
-#SBATCH --mem 24G              #memory requested
+#SBATCH --mem 48G              #memory requested
 #SBATCH -o star.%j.out         #job out logs
 #SBATCH -e star.%j.err         #job error logs
 
@@ -337,7 +339,7 @@ $ less g1_s1_1_starLog.final.out
 
 ### Read Visualization Preparation
 
-If we'd like to visualize our reads, we need to create a BAM index file (bai).  Samtools is a multi-purpose tool for manipulating SAM/BAM files and getting statistics.  Here, we will use samtools to index the aligned BAM files.
+If we'd like to visualize our reads, we need to create a BAM index file (`.bai`).  Samtools is a multi-purpose tool for manipulating SAM/BAM files and getting statistics.  Here, we will use samtools to index the aligned BAM files.
 
 ```sh
 $ less scripts/bamindex.run
@@ -363,15 +365,17 @@ $ for bamfile in *.bam; do sbatch scripts/bamindex.run $bamfile; done
 Once they're finished, we should now see 4 .bai (BAM index) files, one for each BAM file.
 
 ```sh
-$ ls *.bai
+$ ls -lh *.bai
 ```
 ### Read Visualization with IGV
 
 BAM files and BED files can be visualized with the Java-based tool IGV.  IGV can be launched with larger instances of memory by modifying the .bat file; for this exercise, the default is fine. 
 
-First download the BAM files with their corresponding BAI folders to your computer, using FileZilla.  IGV needs both the .bam and its associated .bai to load properly.
+First download the `.bam` files with their corresponding `.bai` files to your computer, using FileZilla.  IGV needs both the .bam and its associated .bai to load properly.
 
-Then, launch IGV, and load the reference genome track (Genomes->Load Genome from Server->M. musculus ()).  Now, you can load your BAM files (File->Load from File)
+Then, launch IGV, and load the reference genome track (Genomes->Load Genome from Server->M. musculus (mm10)).  Now, you can load your BAM files (File->Load from File)
+
+You'll need to explore navigating IGV by gene names and chromosomal coordinates for the assignment.  Here's a zoomed out view of TP53, referenced as "Trp53" in the navigation bar:
 
 ![alt text](https://github.com/hmsrc/user-training/blob/master/trp53.igv.png "IGV Screenshot")
 
@@ -380,8 +384,8 @@ Then, launch IGV, and load the reference genome track (Genomes->Load Genome from
 
 The counts files are the measure of how many read pairs are assigned to a gene.  There are three types of RNA-seq library prep that can used: unstranded (traditional), stranded, or reverse.  For this library prep, we will consider it to be an "unstranded" prep, since we have no other information.  This is column 2 of each counts file.
 
-**You'll need to use FileZilla to download each "_starReadsPerGene.out.tab" for each read pair in preparation for the next exercises**
+**You'll need to use FileZilla to download each `_starReadsPerGene.out.tab` for each read pair in preparation for the next exercises**
 
 ### Next Steps
 
-These read counts files can be aggregated read into R and run through popular R-based differential expression algorithms like edgeR and DESeq2, and used for sophisticated plotting.  The combined counts matrices can even be imported into programs like MS Excel for filtering, low-level statistics, and graphing.  It is of note that these counts files have not been normalized in any way; R-based Differential Expression algorithms control for effects based on library size or median expression, not gene length.  Gene length can be accounted for in functional enrichment analysis, using tools like the R-based GOSeq.  
+These read counts files can be aggregated read into R and run through popular R-based differential expression algorithms like edgeR and DESeq2, and used for sophisticated plotting.  The combined counts matrices can even be imported into programs like MS Excel for filtering, low-level statistics, and graphing.  It is of note that these counts files have not been normalized in any way; R-based differential expression algorithms control for effects based on library size or median expression, not gene length.  Gene length can be accounted for in functional enrichment analysis, using tools like the R-based GOSeq.  
