@@ -226,7 +226,7 @@ g2_s2_2.fastqc.html
 
 To view, open your file exploring manager and double-click on the .html report.  The report will open in your default browser.
 
-These files are 126-128bp long, with Sanger 1.9 PHRED encoding.  They are of acceptable quality, with good GC content and few repeated sequences.  These files are not good candidates for processing like trimming, so we can proceed with the alignment.
+These files are 126bp long, with Sanger 1.9 PHRED encoding.  They are of acceptable quality, with good GC content and few repeated sequences.  There is a lot of adapter content in the sequences.  These files may benefit from adapter trimming, but our aligner will soft clip (ignore) the 5' and 3' ends to align, and we will have an acceptable map rate.
 
 ### STAR Alignment
 
@@ -336,6 +336,8 @@ $ less g1_s1_1_starLog.final.out
                             % of chimeric reads |       0.00%
 
 ```
+
+You can also rerun MultiQC on the directory, and it will add the STAR alignment statistics to the report.
 
 ### Read Visualization Preparation
 
