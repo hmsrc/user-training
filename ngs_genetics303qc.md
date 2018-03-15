@@ -42,7 +42,7 @@ Create a directory in /n/scratch2 (10TB limit) called "ngsclass", change to it, 
 ```sh
 mfk8@compute-a:~$ mkdir -p /n/scratch2/$USER/ngsclass               #create folder "ngsclass" in /n/scratch2 under your user name
 mfk8@compute-a:~$ cd /n/scratch2/$USER/ngsclass                     #change directory to ngsclass
-mfk8@compute-a:/n/scratch2/mfk8/ngsclass$ cp -r /n/groups/rc-training/ngsclass/* . #download all contents to current location (.)
+mfk8@compute-a:/n/scratch2/mfk8/ngsclass$ cp -r /n/scratch2/rc-training/ngsclass/* . #download all contents to current location (.)
 ```
 
 ### Linux 101
