@@ -4,7 +4,7 @@ This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Sp
 
 ### Logging into O2
 
-O2 is the Harvard Medical School High-Performance Compute environment.  With over 8000 cores, 45 TB of RAM and 32 PB attached netework storage, O2 is designed to meet the demands of next-generation sequence analysis.  O2 allows users to leverage the power of compute across multiple cores in a highly scalable manner.
+O2 is the Harvard Medical School High-Performance Compute environment.  With over 8000 cores, 45 TB of RAM and 32 PB attached network storage, O2 is designed to meet the demands of next-generation sequence analysis.  O2 allows users to leverage the power of compute across multiple cores in a highly scalable manner.
 
 O2 user accounts can be created for anyone with an eCommons ID.  To have an account created, visit
 http://rc.hms.harvard.edu/#cluster
@@ -74,10 +74,10 @@ Jobs are submitted with a "sbatch", and always require
 | short | 20 | 12 hr | short single/multicore jobs |
 | medium | 20 | 5 days | medium single/multicore jobs |
 | long | 20 | 1 month | long single/multicore jobs |
-| mpi | 640 | 1 month | large jobs with special parallel code |
-| gpu | - | 72 hours | GPU jobs |
+| mpi | 640 | 5 days | large jobs with special parallel code |
+| gpu | - | 72 gpu hours | GPU jobs |
 | transfer | 4 | 5 days | Moving files to O2 from research.files |
-| highmem | 20 | 1 TB | Large memory jobs |
+| highmem | 1TB | 5 days | Large memory jobs |
 
 additional options include
 * -c number of course requested #max 20
@@ -94,7 +94,7 @@ mfk8@compute-a:~$ module spider                         #see all software availa
 mfk8@compute-a:~$ module load gcc/6.2.0 star/2.5.2b     #load software into your environment
 mfk8@compute-a:~$ module list                           #list all currently loaded modules
 mfk8@compute-a:~$ module unload star/2.5.2b             #unload software
-mfk8@compute-a:~$ module purge                          #unlod all modules
+mfk8@compute-a:~$ module purge                          #unload all modules
 ```
 
 ### Monitoring Jobs on Orchestra
@@ -136,7 +136,7 @@ $ sbatch scripts/getSRA.run SRAnumberhere
 
 # RNA-seq processing exercise
 
-We will be working with a small, unpublished toy mouse dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs, and coallte the reports with MultiQC.  Then we will align these files to the NCBI GRCm38 genome with a popular aligner, STAR. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, we will download our aligned files to a personal machine. Last, we will use the counts files to perform differential expression analysis using the edgeR packgage in R.
+We will be working with a small, unpublished toy mouse dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs, and collate the reports with MultiQC.  Then we will align these files to the NCBI GRCm38 genome with a popular aligner, STAR. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, we will download our aligned files to a personal machine. Last, we will use the counts files to perform differential expression analysis using the edgeR packgage in R.
 
 ### Inspecting data
 
@@ -190,7 +190,7 @@ $ less scripts/fastQC.run
 #!/bin/bash                 
 #SBATCH -p short            #partition
 #SBATCH -t 0-00:05          #time limit, 5min
-#SBATCH --mem 8G            #memory requested
+#SBATCH --mem 1G            #memory requested
 module load fastqc/0.11.3   #software to use
 fastqc $1                   #command
 ```
@@ -232,13 +232,13 @@ These files are 126bp long, with Sanger 1.9 PHRED encoding.  They are of accepta
 
 We will first use STAR to align these files to a reference genome,  and count the reads assigned to each gene.  STAR will create a `.bam` file, which is how the reads mapped, including mapping quality, and a counts file, which we will use to run the differential expression analysis.  
 
-STAR relies on index files to speedily align to a reference genome.  These are STAR-parsed versions of the reference genome in a format that STAR can read.  Currenlty in O2, there are some STAR indices available, but we recommend creating your own using STAR genome-generate on the FASTAs (genomic sequence) and GTF file (annotation file) from the organism and build (UCSC, NCBI) that you choose. Here, the NCBI GRCm38, version 91 STAR indices with a splice junction overhang 125 (read length-1) were created and will be referenced out the "GRCm38_star_125" folder you downloaded. 
+STAR relies on index files to speedily align to a reference genome.  These are STAR-parsed versions of the reference genome in a format that STAR can read.  Currently in O2, there are some STAR indices available, but we recommend creating your own using STAR genome-generate on the FASTAs (genomic sequence) and GTF file (annotation file) from the organism and build (UCSC, NCBI) that you choose. Here, the NCBI GRCm38, version 91 STAR indices with a splice junction overhang 125 (read length-1) were created and will be referenced out the "GRCm38_star_125" folder you downloaded. 
 
 One of the key differences between UCSC and NCBI notation is how chromosomes are called.  In UCSC, the chromosome is called by "chr1", in NCBI/Ensembl, it is just "1".  In order to use GTF annotation from one format on the other, the "chr" must be added or deleted.
 
 For this STAR alignment, we are considering the sequencing library prep to be unstranded.
 
-We will be utilizing multithreading to distribute the compute job over multiple cores (the --runThreadN option).  The majority of O2 machines have up to 32 cores available per node; 20 are permitted to be used for each multicore job.  The larger number of cores that are requested, the longer a job takes to dispatch, as resources are collected for the job. Performance does not scale linearly; the more cores requested does not mean that much speedup, many NGS algorithms top out at usage of 6-8 cores, and just require sufficient memory.  STAR typically just requires 2 cores and a fair bit (48G of memory).
+We will be utilizing multithreading to distribute the compute job over multiple cores (the --runThreadN option).  The majority of O2 machines have up to 32 cores available per node; 20 are permitted to be used for each multicore job.  The larger number of cores that are requested, the longer a job takes to dispatch, as resources are collected for the job. Performance does not scale linearly; the more cores requested does not mean that much speedup, many NGS algorithms top out at usage of 6-8 cores, and just require sufficient memory.  STAR typically just requires 2 cores and a fair bit (48G) of memory.
 
 The STAR  command format is: 
 ```sh
@@ -353,7 +353,7 @@ $ less scripts/bamindex.run
 #SBATCH -t 0-00:10      #time, 10 minutes
 #SBATCH --mem 8G        #memory in GB
 #SBATCH -e bi.%j.err    #error logs
-#SBATCH -o bi.&j.out    #out logs
+#SBATCH -o bi.%j.out    #out logs
 module load gcc/6.2.0 samtools/1.3.1 #load module
 samtools index $1                     #index the command line argument
 ```
@@ -375,7 +375,7 @@ BAM files and BED files can be visualized with the Java-based tool IGV.  IGV can
 
 First download the `.bam` files with their corresponding `.bai` files to your computer, using FileZilla.  IGV needs both the .bam and its associated .bai to load properly.
 
-Then, launch IGV, and load the reference genome track (Genomes->Load Genome from Server->M. musculus (mm10)).  Now, you can load your BAM files (File->Load from File)
+Then, launch IGV, and load the reference genome track (Genomes->Load Genome from Server->Mouse (mm10)).  Now, you can load your BAM files (File->Load from File)
 
 You'll need to explore navigating IGV by gene names and chromosomal coordinates for the assignment.  Here's a zoomed out view of TP53, referenced as "Trp53" in the navigation bar:
 
