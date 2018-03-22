@@ -107,7 +107,7 @@ mfk8@compute-a:~$ scancel jobid                                           #kills
 
 ### Getting Data To/From Orchestra
 
-You can use an sFTP client to download files to your laptop/desktop. RC recommends "FileZilla," which works on all platforms. Login is to `transfer.o2.med.harvard.edu`, port `22` and files can be dragged and dropped to-from O2.  Simple directory manipulations can also be performed via the GUI, but a "refresh" is required to see the effects.
+You can use an sFTP client to download files to your laptop/desktop. RC recommends "FileZilla," which works on all platforms. Login is to `transfer.rc.hms.harvard.edu`, port `22` and files can be dragged and dropped to-from O2.  Simple directory manipulations can also be performed via the GUI, but a "refresh" is required to see the effects.
 
 https://filezilla-project.org/
 
