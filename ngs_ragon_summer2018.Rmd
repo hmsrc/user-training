@@ -113,10 +113,10 @@ directory=getwd()
 sampleFiles=dir(pattern="*\\.tab$")
 
 #strip off the suffix to create sample names from file names
-sampleNames<-gsub("_starReadsPerGene.out.tab", "", sampleFiles)
+sampleNames<-c("EpcamPlusR1", "EpcamPlusR2", "EpcamMinusR1", "EpcamMinusR2")
 
 #Make condition equal to "g1" or "g2"
-sampleConditions<-gsub("_s\\d_1", "", sampleNames)
+sampleConditions<-factor(c(rep("EpcamPlus", 2), rep("EpCamMinus", 2)))
 
 #create sample table with required info
 sampleTable <- data.frame(sampleName = sampleNames,fileName = sampleFiles, condition = sampleConditions)
@@ -126,8 +126,9 @@ dds <- DESeqDataSetFromHTSeqCount(sampleTable = sampleTable,
                                        directory = directory,
                                        design= ~ condition)
 
-#strip off first 4 rows (counts metrics)
-dds<-dds[-c(1:4),]
+#strip off first 4 rows (counts metrics) by keeping only rows that start with ENS
+realgene<-grep("^ENS",rownames(dds))
+dds<-dds[realgene,]
 
 #create a filter that counts must be greater than 3 in at least 2 samples
 keep <- rowSums(counts(dds) >= 3 ) > 2
@@ -144,7 +145,7 @@ diff <- DESeq(filtered)
 resultsNames(diff)
 
 #create results data frame for comparison selected
-res <- results(diff, name="condition_g2_vs_g1")
+res <- results(diff, name="condition_EpcamPlus_vs_EpCamMinus")
 
 #set a Benjamini-Hochberg filter of 0.05
 bh<-res[which(res$padj <= 0.05),]
