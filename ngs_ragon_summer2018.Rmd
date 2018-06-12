@@ -6,7 +6,7 @@ You will need to have R version > 3.0 installed.
 
 # edgeR for Differential Expression
 
-```r
+```{r}
 #set your working directory to where the ReadPerGene.out.tab files are located:
 
 setwd("path/to/your/counts/files")
@@ -169,7 +169,7 @@ write.table(res_counts, file="deseq2.results.ens.txt", sep="\t", quote=FALSE)
 
 Creates an additional output file with gene symbol information added (takes more time, and sometimes biomaRt is down)
 
-```r
+```{r}
 library(biomaRt)
 
 #set mart to mouse
