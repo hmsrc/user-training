@@ -75,9 +75,9 @@ Jobs are submitted with a "sbatch", and always require
 | medium | 20 | 5 days | medium single/multicore jobs |
 | long | 20 | 1 month | long single/multicore jobs |
 | mpi | 640 | 5 days | large jobs with special parallel code |
-| gpu | - | 72 gpu hours | GPU jobs |
+| gpu | - | 120 gpu hours | GPU jobs |
 | transfer | 4 | 5 days | Moving files to O2 from research.files |
-| highmem | 1TB | 5 days | Large memory jobs |
+| highmem | 756GB | 5 days | Large memory jobs |
 
 additional options include
 * -c number of course requested #max 20
@@ -285,7 +285,7 @@ $ sbatch scripts/star.run g2_s1_1.fastq g2_s1_2.fastq #group 2 sample 1 reads 1 
 $ sbatch scripts/star.run g2_s2_1.fastq g2_s2_2.fastq #group 2 sample 2 reads 1 and 2
 ```
 
-We can monitor these jobs again with our "squeue" command
+We can monitor these jobs again with our "O2squeue" command
 ```sh
 $ O2squeue
 ```
