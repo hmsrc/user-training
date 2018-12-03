@@ -1,34 +1,38 @@
 # HMS Research Computing: Intro to Next-Gen Sequencing Technologies Part II
 
-This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Summer 2018 for the Ragon Institute.  It provides an O2 HPC environment-oriented workflow for RNA-seq analysis.
+This is the practicum portion of "Intro to Next-Gen Sequencing Technologies," Fall 2018.  It provides an O2 HPC environment-oriented workflow for RNA-seq analysis.
 
 ### Logging into O2
 
-O2 is the Harvard Medical School High-Performance Compute environment.  With over 8000 cores, 56 TB of RAM and 35 PB attached network storage, O2 is designed to meet the demands of next-generation sequence analysis.  O2 allows users to leverage the power of compute across multiple cores in a highly scalable manner.
+O2 is the Harvard Medical School High-Performance Compute environment.  With over 11000 cores, 60 TB of RAM and 35 PB attached network storage, O2 is designed to meet the demands of next-generation sequence analysis.  O2 allows users to leverage the power of compute across multiple cores in a highly scalable manner.
 
 O2 user accounts can be created for anyone with an eCommons ID.  To have an account created, visit
 http://rc.hms.harvard.edu/#cluster
 and fill out the account request form.
 
-To log into O2, 
+To log into O2 from outside the HMS network, you will need 2-Factor Authentication.  HMS RC recommends the "Duo" app, with instructions here:
+https://wiki.rc.hms.harvard.edu/pages/viewpage.action?pageId=23986542
 
    * Mac: from the terminal, type
    ```
    ssh yourEcommons@o2.hms.harvard.edu
+   1/2/3 (push/phone/sms)
    ```
    * Windows: from MobaXterm, type
    ```
    ssh yourEcommons@o2.hms.harvard.edu
+   1/2/3 (push/phone/sms)
    ```
    * Linux: from the terminal, type
    ```
    ssh yourEcommons@o2.hms.harvard.edu
+   1/2/3 (push/phone/sms)
    ```
 
 ### Welcome!
 
 Now you're on the shell login servers (login01-05), please don't do computationally-heavy work here!
-Instead, launch an interactive session to work on a compute node (compute-a, compute-e etc)
+Instead, launch an interactive session to work on a compute node (compute-a, compute-e, compute-f etc)
 
 ```sh
 mfk8@login01:~$ srun --pty -p interactive -t 0-12:00 --mem 8G bash
@@ -107,7 +111,7 @@ mfk8@compute-a:~$ scancel jobid                                   #kills job
 
 ### Getting Data To/From Orchestra
 
-You can use an sFTP client to download files to your laptop/desktop. RC recommends "FileZilla," which works on all platforms. Login is to `transfer.rc.hms.harvard.edu`, port `22` and files can be dragged and dropped to-from O2.  Simple directory manipulations can also be performed via the GUI, but a "refresh" is required to see the effects.
+You can use an sFTP client to download files to your laptop/desktop. RC recommends "FileZilla," which works on all platforms. Login is to `transfer.rc.hms.harvard.edu`, port `22` and files can be dragged and dropped to-from O2.  2-Factor authentication outside the HMS network will be via default in .bashrc or .bash_profile.  Simple directory manipulations can also be performed via the GUI, but a "refresh" is required to see the effects.
 
 https://filezilla-project.org/
 
@@ -136,7 +140,7 @@ $ sbatch scripts/getSRA.run SRAnumberhere
 
 # RNA-seq processing exercise
 
-We will be working with a small, unpublished toy mouse dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs, and collate the reports with MultiQC.  Then we will align these files to the NCBI GRCm38 genome with a popular aligner, STAR. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, we will download our aligned files to a personal machine. Last, we will use the counts files to perform differential expression analysis using the edgeR packgage in R.
+We will be working with a small, unpublished toy mouse dataset from GEO to familiarize you with an RNA-seq processing workflow.  We will run quality control analysis via FastQC to identify any issues with the runs, and collate the reports with MultiQC.  Then we will align these files to the NCBI GRCm38 genome with a popular aligner, STAR. We will practice manipulating the files using Samtools.  For visualization of the reads using IGV, we will download our aligned files to a personal machine. Last, we will use the counts files to perform differential expression analysis using the edgeR and DESeq2 packgages in R.
 
 ### Inspecting data
 
@@ -205,7 +209,7 @@ We can check on these jobs status by running
 $ O2squeue
 ```
 
-Once these jobs are all finished running, we can aggregate the reports together with MultiQC.  This takes our 8 `fastq.html` reports, and we will create a master report `multiqc_report.html`.  Since we're in an interactive session (terminal says compute-a or compute-e), we can load the MultiQC module directly and run, it takes less than a minute
+Once these jobs are all finished running, we can aggregate the reports together with MultiQC.  This takes our 8 `fastq.html` reports, and we will create a master report `multiqc_report.html`.  Since we're in an interactive session (terminal says compute-a or compute-e or compute-f), we can load the MultiQC module directly and run, it takes less than a minute
 
 ```sh
 $ module load gcc/6.2.0 python/2.7.12 multiqc/1.3
@@ -273,7 +277,16 @@ $ less scripts/star.run
 #SBATCH -e star.%j.err         #job error logs
 
 module load gcc/6.2.0 star/2.5.2b
-STAR --runThreadN 2 --genomeDir  GRCm38_star_125 --sjdbGTFfile GRCm38_star_125/Mus_musculus.GRCm38.91.chr.gtf --readFilesIn $1 $2 --outFileNamePrefix "${1%.*}"_star --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes NH HI NM MD AS --outReadsUnmapped Fastx --quantMode GeneCounts
+STAR --runThreadN 2 \ 
+--genomeDir  GRCm38_star_125 \
+--sjdbGTFfile GRCm38_star_125/Mus_musculus.GRCm38.91.chr.gtf \
+--readFilesIn $1 $2 \
+--outFileNamePrefix "${1%.*}"_star \
+--outSAMtype BAM SortedByCoordinate \
+--outSAMunmapped Within \
+--outSAMattributes NH HI NM MD AS \
+--outReadsUnmapped Fastx \
+--quantMode GeneCounts
 ```
 
 We will execute this script on each pair of reads (_1 and _2) by passing them as command line arguments ($1 and $2) to the sbatch script.
