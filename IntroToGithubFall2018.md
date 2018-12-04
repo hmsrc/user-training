@@ -2,7 +2,7 @@
 
 ![HMS](./img/logo.png)
 
-## Welcome
+## Welcome to Introduction to Git and Github
 
 ### Term: Fall 2018
 
@@ -10,29 +10,27 @@
 
 ### Date: 2018-12-05 3pm-5pm
 
-Welcome to Introduction to Git and Github. At the end of this session there will be a link to a course survey; any feedback you can offer would be greatly appreciated.
-
 ## Registering for Github
 
-First things first, we should probably register for a Github account if you don't already have one. Registering for Github is free and easy. All we need is a username, email, and password. Github sends a **Verification Email** that may take a couple of minutes, so we should probably get that process started.
+If you do not already have a Github account, you may wish to sign up for one. The process is free and easy and only takes a few minutes. All we need is a username, email, and password. Github sends a **Verification Email** which will need to be received and clicked on.
 
-Please navigate to [Join GitHub](https://github.com/join). The page should look like the figure below:
+Please feel free to navigate to [Join GitHub](https://github.com/join). The page should look like the figure below:
 
 ![Register for Github](./img/hmsrcght-register.png)
 
-There are also paid plans for Github described at [Plans for all workflows](https://github.com/pricing). A paid Developer account is $7 per month and the main feature is unlimited private repositories. Team accounts start at $25 for 5 users and in addition to unlimited private repositories, you also get team and user permissions, which makes access control easy to setup. That is the way we manage access to our repositories in [Research Computing](https://github.com/hmsrc).
+In addition to the free account, there are also paid plans for Github described at [Plans for all workflows](https://github.com/pricing). A paid Developer account is 7 dollars a month and the main feature is unlimited private repositories. Team accounts start at 25 dollars a month for 5 users and in addition to unlimited private repositories, you also get team and user permissions, which makes access control easy to setup. That is the way we manage access to our team's repositories in [Research Computing](https://github.com/hmsrc).
 
 ## What is Git
 
-So I started preparing for this class the way I normally research a new topic:
+So I started preparing for this class in the way I normally begin researching a new topic:
 
 ![What is Git](./img/hmsrcght-whatis.png)
 
-Hmm. Ok. Well the Git we will be talking about today is actually an exciting piece of software; and its the most widely used modern version control system in the world.
+Hmm. Ok. Well the Git we will be talking about today is actually popular piece of software and the most widely used modern version control system in the world.
 
 It was originally developed by Linus Torvalds. You may have heard of his other popular project, the [Linux kernel](https://github.com/torvalds/linux).
 
-Git is actually a Distributed Version Control System. The key word being *distributed*. Older version control systems, like CVS or Sourcesafe, are centralized and have one master place for the full version history of a repository. With Git, every collaborator has a repository that can contain the full history of all changes.
+Git is actually a Distributed Version Control System. The key word being *distributed*. Older version control systems, like [CVS](https://www.nongnu.org/cvs/) or [Sourcesafe](https://en.wikipedia.org/wiki/Microsoft_Visual_SourceSafe), are centralized and have one master place for the full version history of a repository. With Git, every collaborator has a repository that contains the full history of all changes.
 
 The details of how Git came to be are interesting. The Linux project was using a proprietary version control system and a licensing change occurred. Details are available in a number of places including the [Wikipedia](https://en.wikipedia.org/wiki/Git) article.
 
@@ -41,7 +39,7 @@ Git is not the only distributed source control management (SCM) system in popula
 - [Mercurial SCM](https://www.mercurial-scm.org/)
 - [Fossil SCM](https://www.fossil-scm.org/index.html/doc/trunk/www/index.wiki)  
 
-Both of these projects are excellent and may fit your needs. But today, of course, we will be focusing on Git. While we will be covering different ways to interact with Git, you may be interested to know that Git is already installed on O2, as shown below:
+Both of these projects are competent and mature and may fit your needs. But today, of course, we will be focusing on Git. While we will be covering different ways to interact with Git, you may be interested to know that Git is already installed on O2, as shown below:
 
 ```bash
 $ which git
@@ -79,19 +77,21 @@ I highly recommend the more practical version of this paper, [Good Enough Practi
 
 [Github](https://github.com/) is a site that makes collaborating on software projects easier than ever. It hosts Git repositories and provides a nice web-based graphical user interface. It goes beyond that by adding useful project management features like access control, and issue tracking. It also provides tools for collaborators to make pull requests, initiate code reviews and merge changes.
 
+Github has enjoyed trememdous growth and popularity. Earlier this year Microsoft acquired Github for [$7.5 billion](https://techcrunch.com/2018/06/04/microsoft-has-acquired-github-for-7-5b-in-microsoft-stock/).
+
 We will cover some of the most useful features of Github collaboration.
 
-## Download GitHub Desktop
+## Tooling
 
-It is important to note that you can do all your work directly from the `git` command line interface (CLI). You could even do all your work directly on O2.
+It is important to note that you can do all your work directly from the `git` command line interface (CLI), without ever interacting with a GUI or editor. You could even do all your work directly on O2 in a terminal.
 
-But realistically that is not how most newer users choose to work. A common practice that using a system like Git allows is to develop locally, using some mix of the command line and graphical tools and editors and then "pushing" changes up to Guthub.
+Realistically, that is not how most users these days choose to work. A common practice that using a system like Git allows is to develop locally, using some mix of the command line, graphical tools and editors, and then "pushing" changes up to Guthub.
 
-With that in mind, Github has developed  [GitHub Desktop](https://desktop.github.com/), a GUI version available for both **Mac** and **Windows**. I recommend trying it and seeing if it works for you.
+With that in mind, Github has developed [GitHub Desktop](https://desktop.github.com/), a GUI version available for both **Mac** and **Windows**. I use Github Desktop daily and recommend you giving it a try and seeing if it works for you.
 
 ![Github Desktop](./img/hmsrcght-desktop.png)
 
-I will be doing demonstrations today both with Github Desktop for Mac and a free, open source text editor named [Atom](https://atom.io/), which is also developed by Github and has really nice [integration with Github](https://github.atom.io/).
+In addition to Github Desktop there are several free text editors that offer excellent git integration. Today I will be demonstrating with two editors I enjoy and use regularly. The first is  [Atom](https://atom.io/). Atom is free and open source and is also developed by Github with really nice [integration with Github](https://github.atom.io/). The other is [vscode](https://code.visualstudio.com/) a free editor from Microsoft which also has tight integration with Git.
 
 On Linux, the `git` command is usually installed by default, as it is on O2. On Redhat/CentOS, you can install via `sudo yum install git` or on Ubuntu/Debian via `sudo apt-get install git`.
 
@@ -437,13 +437,15 @@ Back in the left-hand pane we should see the repo has now moved from the Other s
 
 Your default browser should open with your new Github repository. Take a minute to review your commits and look around the repo.
 
-## Github Flow
+## Github Workflows
 
-As teams began making Git a core part of the development process, several Git workflows became popular. One in particular, [Git Flow](http://nvie.com/posts/a-successful-git-branching-model/), gained a lot of attention, despite its complexity. A simpler approach known as [Github Flow](https://guides.github.com/introduction/flow/) really emerged over time and is now the most popular approach. And simple it is. Now that our repo is up on Github, let's utilize Github Flow for our project.
+As teams began making Git a core part of the development process, several approaches to workflows became popular. One in particular, [Git Flow](http://nvie.com/posts/a-successful-git-branching-model/), gained a lot of attention, despite its complexity.
+
+A simpler approach known as [Github Flow](https://guides.github.com/introduction/flow/) based on Pull Requests has emerged over time to become the most popular approach. Github's documentation is very good and shows how simple the approach is. This is the workflow that we use in Research Computing, and it is the one I would recommend for most teams starting out. We use a couple of neat features such as requiring code review that we can discuss further.
 
 ## Github Issues
 
-You've probably use some issue tracker before like Jira, or, ahem **Stat**. Well Github Issues is like that, only simpler.
+You've probably use some issue tracker before like Service Now **Stat** or Jira. Github Issues is like those tools only simpler.
 
 Let's create a new issue for some enhancement. In your repo at github.com, click Issues and then click **New Issue**.
 
@@ -545,9 +547,11 @@ Github is consistently adding additional access controls and new ways to collabo
 
 We use Github Issues alot. We use Issues to track progress when diagnosing technical problems, and developing new features, etc.
 
-I feel like there is some important collaboration feature I'm forgetting...
+## Semantics
 
-## Oh yeah, :+1: Emoji
+TODO
+
+## :+1: Emoji
 
 :bowtie: | :smile: | :laughing: | :blush: | :smiley: | :relaxed: | :smirk: | :heart_eyes: | :flushed: | :relieved: | :satisfied: | :grin: | :wink: |  :tongue: | :unamused: | :sweat_smile: | :sweat:
 
@@ -555,7 +559,7 @@ I feel like there is some important collaboration feature I'm forgetting...
 
 ## Q & A
 
-I wanted to leave some time open for questions and answers. For questions we can't answer right away, we will capture and follow up.
+I wanted to leave plenty of time for questions and discussion. Please feel free to ask any questions you have and if we are unable to answer right away, we will capture and follow up.
 
 ## Contact information
 
