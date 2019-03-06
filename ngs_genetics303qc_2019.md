@@ -362,7 +362,7 @@ $ less scripts/bamindex.run
 
 ```sh
 #!/bin/bash            
-#SBATCH -p priority     #partition
+#SBATCH -p short     #partition
 #SBATCH -t 0-00:10      #time, 10 minutes
 #SBATCH --mem 8G        #memory in GB
 #SBATCH -e bi.%j.err    #error logs
@@ -371,7 +371,7 @@ module load gcc/6.2.0 samtools/1.3.1 #load module
 samtools index $1                     #index the command line argument
 ```
 
-We can loop over all of our BAM files, submitting a priority job for each (2 can run at a time).
+We can loop over all of our BAM files, submitting a short job for each.
 
 ```sh
 $ for bamfile in *.bam; do sbatch scripts/bamindex.run $bamfile; done
