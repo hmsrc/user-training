@@ -406,7 +406,7 @@ I now have three commits and they are displayed in chronological order.
 
 ## Git Rebase
 
-Some users who commit frequently and don't wish to show a commit log full of "silly typo fix" commits prefer to "squash" several commits into a more reasonable series. A recent article entitled [git rebase in depth](https://git-rebase.io/) sufficiently covers the process. The accompanying [Hacker News thread](https://news.ycombinator.com/item?id=19877811) has additional discussion on the topic. 
+Some users who commit frequently and don't wish to show a commit log full of "silly typo fix" commits prefer to "squash" several commits into a more reasonable series. A recent article entitled [git rebase in depth](https://git-rebase.io/) sufficiently covers the process. The accompanying [Hacker News thread](https://news.ycombinator.com/item?id=19877811) has additional discussion on the topic.
 
 ## Working with Github Desktop
 
@@ -454,8 +454,6 @@ A simpler approach known as [Github Flow](https://guides.github.com/introduction
 You've probably use some issue tracker before like Service Now **Stat** or Jira. Github Issues is like those tools only simpler.
 
 Let's create a new issue for some enhancement. In your repo at github.com, click Issues and then click **New Issue**.
-
-![New Issue](./img/hmsrcght-newissue.png)
 
 Fill out the title and description. If you want, assign it to yourself and choose a label like **enhancement**. Then click **Submit New Issue**.
 
@@ -553,7 +551,7 @@ Github has created a useful [site](https://choosealicense.com/)] to help inform 
 
 ## Exploring new software
 
-Some of us enjoy finding new and trending projects. One useful way to start this process is at [Github Trending](https://github.com/trending). 
+Some of us enjoy finding new and trending projects. One useful way to start this process is at [Github Trending](https://github.com/trending).
 
 You can filter by specific languages like so:
 
@@ -585,10 +583,6 @@ You can organize your collaborators into teams and then assign whole teams granu
 Github is consistently adding additional access controls and new ways to collaborate. This past week, [Team Discussions](https://github.com/blog/2471-introducing-team-discussions) were introduced. While I haven't used the new functionality (we currently use Slack for all team communications), we do use Github alot for collaboration.
 
 We use Github Issues alot. We use Issues to track progress when diagnosing technical problems, and developing new features, etc.
-
-## Semantics
-
-TODO
 
 ## :+1: Emoji
 
