@@ -81,7 +81,7 @@ I highly recommend the more practical version of this paper, [Good Enough Practi
 
 Github has enjoyed trememdous growth and popularity. Earlier this year Microsoft acquired Github for [$7.5 billion](https://techcrunch.com/2018/06/04/microsoft-has-acquired-github-for-7-5b-in-microsoft-stock/).
 
-We will cover some of the most useful features of Github collaboration.
+Just as with `git`, Github is not the only `git` hosting option available. Some users who prefer self-hosting, may wish to consider alternatives like the popular [Gitlab Community Edition](https://gitlab.com/gitlab-org/gitlab-ce/).
 
 ## Tooling
 
@@ -404,6 +404,10 @@ Date:   Sun Apr 9 19:45:44 2017 -0400
 
 I now have three commits and they are displayed in chronological order.
 
+## Git Rebase
+
+Some users who commit frequently and don't wish to show a commit log full of "silly typo fix" commits prefer to "squash" several commits into a more reasonable series. A recent article entitled [git rebase in depth](https://git-rebase.io/) sufficiently covers the process. The accompanying [Hacker News thread](https://news.ycombinator.com/item?id=19877811) has additional discussion on the topic. 
+
 ## Working with Github Desktop
 
 So we could happily continue on - working in the terminal forever, but there are some features of the GUI client that are really nice to have. So we have decided to make our repository managable in Github Desktop.
@@ -536,6 +540,39 @@ Also, be extra careful not to accidentally put credentials, such as passwords an
 Additionally, intermediate data files and other results that can be re-generated from raw data need not be added to version control.
 
 Adding a .gitignore file to your repo is a good way to help ensure you don't inadvertantly share sensitive info.
+
+## Github Learning Lab
+
+The Github Learning Lab provides extensive hands-on training using real projects. All that is necessary to access is a free Github account.
+
+## Licensing your repository
+
+Implicitly adding a license to your repository makes it easier to attract potential collaborators and interest in your projects.
+
+Github has created a useful [site](https://choosealicense.com/)] to help inform the process. Additional details are also available [here](https://help.github.com/en/articles/licensing-a-repository).
+
+## Exploring new software
+
+Some of us enjoy finding new and trending projects. One useful way to start this process is at [Github Trending](https://github.com/trending). 
+
+You can filter by specific languages like so:
+
+- [Python](https://github.com/trending/python?since=daily)
+- [R](https://github.com/trending/r?since=daily)
+- [Julia](https://github.com/trending/julia?since=daily)
+
+Another useful way to find interesting projects is through [Topics](https://github.com/topics). A couple of topics I like to keep on are:
+
+- [hpc](https://github.com/topics/hpc)
+- [reproducible-science](https://github.com/topics/reproducible-science)
+- [bioinformatics](https://github.com/topics/bioinformatics)
+
+## Beta Github Features
+
+Several new features have been introduced in previous months. While these features currently are in beta and require a sign up, they likely will become very popular.
+
+- [Github Actions](https://github.com/features/actions) allows users to automate workflows from idea to production.
+- [GitHub Package Registry](https://github.com/features/package-registry) allows you to package up your project, say in a Docker container, and publish within your organization, or publicly.
 
 ## Github Organizations
 
