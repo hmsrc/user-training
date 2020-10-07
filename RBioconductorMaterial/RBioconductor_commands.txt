@@ -123,3 +123,14 @@ t.test(mydf[,1:3],mydf[,4:6])
 
 # Class Example: Simple Wilcoxon #
 wilcox.test(mymatrix[,1:3], mymatrix[,4:6])
+
+# Plotting: short example (ggplot2) #
+library ("ggplot2")
+data("midwest", package = "ggplot2")
+gg <- ggplot(midwest, aes(x=area, y=poptotal)) + 
+  geom_point(aes(col=state, size=popdensity)) + 
+  labs(y="Population", 
+       x="Area", 
+       title="Scatterplot", 
+       caption = "Source: midwest")
+gg
