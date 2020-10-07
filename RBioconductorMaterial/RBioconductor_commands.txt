@@ -101,6 +101,11 @@ apply(mymatrix,2,sum)
 mydf <- read.table("Rcoursetestdata1.csv", header=TRUE,  row.names=1, sep=",")
 head(mydf)
 
+# -OR- Import Directly from GitHub
+# library(RCurl)
+# my.url <- getURL(https://raw.githubusercontent.com/hmsrc/user-training/master/RBioconductorMaterial/Rcoursetestdata1.csv)
+# mydf <- read.csv(text=my.url)
+
 # Class Example: basic stats#
 summary(mydf)
 
