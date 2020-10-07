@@ -70,7 +70,7 @@ mymatrix[,1]  #returns all of column 1
 
 # Data type: Data Frames #
 mydataframe <- as.data.frame(mymatrix)
-names(mydataframe) <- c(“column1name”,  “column2name”)
+names(mydataframe) <- c("column1name", "column2name")
 row.names(mydataframe) <- mydataframe[,1]
 
 # Series Shortcut #
@@ -103,8 +103,8 @@ head(mydf)
 
 # -OR- Import Directly from GitHub
 # library(RCurl)
-# my.url <- getURL(https://raw.githubusercontent.com/hmsrc/user-training/master/RBioconductorMaterial/Rcoursetestdata1.csv)
-# mydf <- read.csv(text=my.url)
+# my.url <- getURL("https://raw.githubusercontent.com/hmsrc/user-training/master/RBioconductorMaterial/Rcoursetestdata1.csv")
+# mydf <- read.csv(text=my.url,header=TRUE,row.names=1)
 
 # Class Example: basic stats#
 summary(mydf)
@@ -123,4 +123,3 @@ t.test(mydf[,1:3],mydf[,4:6])
 
 # Class Example: Simple Wilcoxon #
 wilcox.test(mymatrix[,1:3], mymatrix[,4:6])
-
