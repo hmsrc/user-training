@@ -1,0 +1,21 @@
+,bcr_patient_barcode,menopause,age,method_initial_path_dx,surgical_procedure_first,margin_status,lymph_nodes,lymph_nodeN,ajcc_pathologic_tumor_stage,er_status,pr_status,her2_status,anatomic_neoplasm_subdivision
+1,TNBC1,1,51,Core needle biopsy,Modified Radical Mastectomy,Negative,11,0,Stage IIA,0,0,0,Left Lower Inner Quadrant
+2,TNBC2,1,45,Tumor resection,Lumpectomy,Negative,1,0,[Not Available],0,0,0,Right Lower Outer Quadrant
+3,TNBC3,1,82,Core needle biopsy,Other,Negative,8,4,Stage IIIA,0,0,0,Left
+4,TNBC4,0,38,Core needle biopsy,Other,[Not Available],16,1,Stage IIA,0,0,0,Left Upper Outer Quadrant
+5,TNBC5,1,51,Fine needle aspiration biopsy,Modified Radical Mastectomy,Negative,11,9,[Not Available],0,0,0,Right Lower Outer Quadrant
+6,TNBC6,1,54,Core needle biopsy,Lumpectomy,Negative,3,0,Stage IIA,0,0,0,Left
+7,TNBC7,1,50,Core needle biopsy,Lumpectomy,Negative,14,5,Stage IIIA,0,0,0,Left Lower Inner Quadrant
+8,TNBC8,0,37,Tumor resection,Simple Mastectomy,Negative,38,1,Stage IIB,0,0,0,Right Upper Inner Quadrant
+9,TNBC9,1,62,Tumor resection,Lumpectomy,Negative,8,0,Stage IIA,0,0,0,Left
+10,TNBC10,1,55,Tumor resection,Lumpectomy,Negative,21,5,Stage IIIA,0,0,0,Right Upper Outer Quadrant
+11,Normal1,1,64,Cytology (e.g. Peritoneal or pleural fluid),Lumpectomy,Negative,10,0,Stage IIA,1,1,1,Right Upper Outer Quadrant
+12,Normal2,1,80,Fine needle aspiration biopsy,Modified Radical Mastectomy,[Not Available],16,2,Stage IIB,1,1,1,Left
+13,Normal3,1,77,Fine needle aspiration biopsy,Other,[Not Available],12,0,Stage I,1,1,1,Left Upper Outer Quadrant
+14,Normal4,1,56,Cytology (e.g. Peritoneal or pleural fluid),Modified Radical Mastectomy,Negative,10,10,Stage IIIC,1,1,1,Right Upper Outer Quadrant
+15,Normal5,0,41,Tumor resection,[Not Available],Negative,7,4,Stage IIIA,1,1,1,Left Upper Inner Quadrant
+16,Normal6,1,90,Core needle biopsy,Simple Mastectomy,Negative,10,0,Stage IIA,1,1,1,Right Upper Inner Quadrant|Right Lower Inner Quadrant
+17,Normal6,0,48,Core needle biopsy,Other,[Not Available],15,3,Stage IIB,1,1,1,Left
+18,Normal8,0,46,Tumor resection,Simple Mastectomy,Negative,5,0,Stage IA,0,0,0,Right Lower Outer Quadrant
+19,Normal9,1,62,Tumor resection,[Not Available],Negative,5,0,Stage IIA,1,1,0,Right Upper Outer Quadrant
+20,Normal10,0,40,Cytology (e.g. Peritoneal or pleural fluid),Modified Radical Mastectomy,Negative,10,0,Stage IIA,1,1,1,Left Upper Inner Quadrant
