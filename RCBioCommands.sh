@@ -84,7 +84,7 @@ cmd1 && cmd2 && cmd3
 
 mkdir outputDir && cmdToCreateOutput
 
-ls $input && cmd -in $input || exit 
+ls $input && cmd –in $input || exit 
 
 # Creating a Simple Text File
 # “Nano,” “vi”, “emacs” are simple command-line editors available.
