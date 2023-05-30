@@ -6,7 +6,7 @@ set -x
 module spider rcbio
 
 # load module
-module load rcbio/1.3
+module load rcbio/1.3.3
 
 # insteractive job
 srun --pty -p interactive -t 0-2:00  --mem 2G bash
