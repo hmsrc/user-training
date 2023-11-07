@@ -1,0 +1,21 @@
+The `requirements.txt` file in this directory contains all the packages
+that are installed into the training virtual environment that was used
+to teach this workshop. If you would like to create a copy of this
+virtual environment for your own uses (e.g., to step through the
+accompanying notebook on your own time), you can set up a copy of this
+environment with the following instructions (on O2):
+
+module load gcc/9.2.0 python/3.9.14
+virtualenv /path/to/trainingvenv
+source /path/to/trainingvenv/bin/activate
+pip3 install -r /path/to/requirements.txt
+
+where `/path/to` is wherever you choose to put the virtual environment
+and `requirements.txt` file (it must be downloaded or cloned into O2 before
+you can follow these instructions).
+
+If you are trying to create this environment in a location not on O2,
+consult whatever documentation is associated with your local python
+installation in order to set up the virtual environment with this
+`requirements.txt` file.
+
