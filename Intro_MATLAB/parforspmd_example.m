@@ -1,7 +1,7 @@
-clear all;clc
+clear variables;clc
 parpool('local',4)
-
-ARRAY=rand(100,1);
+%%
+ARRAY=rand(30000000,1);
 %%
 tic
 spmd
@@ -30,8 +30,26 @@ end
 toc
 %%
 tic
+spmd
+    
+   %disp('I am worker')
+   %labindex
+   LOW=(labindex-1)*length(ARRAY)/numlabs+1;
+   HIGH=length(ARRAY)/numlabs*labindex;
+   tot=sum(ARRAY((LOW:HIGH)));    
+   alltot=gop(@plus,tot,1); %use spmdReduceR2022b +
+   labBarrier
+   if (labindex == 1)
+    %  disp('big total') 
+      alltot
+   end
+end
+toc
+
+%%
+tic
 tot2=0; 
- parfor i=1:length(ARRAY)
+parfor i=1:length(ARRAY)
      
     tot2=tot2+ARRAY(i); 
    
@@ -56,8 +74,15 @@ sum(ARRAY(:))
 toc
 
 %%
+tic;for i=1:10;pause(1);end;toc
+%%
 
 tic;parfor i=1:10;pause(1);end;toc
 %%
 tic;parfor i=1:12;pause(1);end;toc
+
+
+
+
+
 
